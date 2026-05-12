@@ -206,14 +206,13 @@ export default function LandingPage() {
                 className="text-center text-[11px] mt-3"
                 style={{ color: "var(--color-text-muted)" }}
               >
-                Le pot communautaire en monnaie fictive. Tirage proportionnel
-                à la valeur déposée.
+                Le pot communautaire en monnaie fictive. Tirage proportionnel à
+                la valeur déposée.
               </p>
             </div>
           </div>
         </div>
       </section>
-
 
       {/* ── COMPTEUR SOCIAL ─────────────────────────────────────── */}
       <section

@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar'
 import { MobileNav } from '@/components/layout/MobileNav'
+import { CoachWidget } from '@/components/coach/CoachWidget'
 
 // Layout commun à toutes les pages de l'app
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Bottom nav mobile : visible < md */}
       <MobileNav />
+
+      {/* Prism — coach IA flottant, toutes pages /game/* */}
+      <CoachWidget />
     </div>
   )
 }
