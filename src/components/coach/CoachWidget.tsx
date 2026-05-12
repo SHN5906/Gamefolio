@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, X, AlertCircle, Sparkles } from 'lucide-react'
+import { Send, X, Sparkles } from 'lucide-react'
 import { PrismSVG } from '@/components/ui/Logo'
 import {
   useBalance,
   useInventoryGraded,
   useProfile,
 } from '@/hooks/useGame'
+import { respondLocal, type CoachContext } from '@/lib/ai/coach-engine'
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -16,16 +17,10 @@ interface ChatMessage {
   content: string
 }
 
-interface StreamEvent {
-  delta?: string
-  done?: boolean
-  error?: string
-  usage?: { input: number; output: number; cacheRead: number; cacheWrite: number }
-}
-
 // ── Storage ──────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'gf:prism:history'
+const STORAGE_KEY = 'gf:prism:history.v2'
+const HISTORY_CAP = 30
 
 function loadHistory(): ChatMessage[] {
   if (typeof window === 'undefined') return []
@@ -33,7 +28,7 @@ function loadHistory(): ChatMessage[] {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw) as ChatMessage[]
-    return parsed.slice(-20)
+    return parsed.slice(-HISTORY_CAP)
   } catch {
     return []
   }
@@ -42,9 +37,30 @@ function loadHistory(): ChatMessage[] {
 function saveHistory(messages: ChatMessage[]): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-20)))
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(messages.slice(-HISTORY_CAP)),
+    )
   } catch {
-    // localStorage plein ou désactivé — on ignore
+    // localStorage plein/désactivé — on ignore
+  }
+}
+
+// ── Fake typing — donne l'illusion d'une réponse pensée ──────────────
+// Découpe la réponse en chunks de ~3-6 caractères avec délai ~12 ms entre.
+// L'utilisateur peut interrompre via le bouton (état `typing`).
+async function typeOut(
+  text: string,
+  onChunk: (partial: string) => void,
+  signal: AbortSignal,
+): Promise<void> {
+  let i = 0
+  while (i < text.length) {
+    if (signal.aborted) return
+    const next = Math.min(i + 3 + Math.floor(Math.random() * 4), text.length)
+    onChunk(text.slice(0, next))
+    i = next
+    await new Promise(r => setTimeout(r, 14))
   }
 }
 
@@ -52,12 +68,11 @@ function saveHistory(messages: ChatMessage[]): void {
 
 export function CoachWidget() {
   const [open, setOpen] = useState(false)
-  const [hasNew, setHasNew] = useState(true) // badge pulse à l'arrivée
+  const [hasNew, setHasNew] = useState(true)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
-  const [streaming, setStreaming] = useState(false)
+  const [typing, setTyping] = useState(false)
   const [partial, setPartial] = useState('')
-  const [error, setError] = useState<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -67,12 +82,12 @@ export function CoachWidget() {
   const { items, totalValue } = useInventoryGraded()
   const { profile } = useProfile()
 
-  // ── Chargement de l'historique au mount ─────────────────────────────
+  // Charge l'historique au mount
   useEffect(() => {
     setMessages(loadHistory())
   }, [])
 
-  // ── Auto-scroll en bas à chaque nouveau message ────────────────────
+  // Auto-scroll en bas à chaque nouveau message ou char ajouté
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
@@ -80,7 +95,7 @@ export function CoachWidget() {
     })
   }, [messages, partial])
 
-  // ── Focus l'input à l'ouverture ────────────────────────────────────
+  // Focus l'input à l'ouverture du panel
   useEffect(() => {
     if (open) {
       setHasNew(false)
@@ -88,25 +103,16 @@ export function CoachWidget() {
     }
   }, [open])
 
-  // ── Cleanup du stream en cours si on unmount ───────────────────────
+  // Cleanup du timer d'animation en unmount
   useEffect(() => {
     return () => abortRef.current?.abort()
   }, [])
 
-  // ── Envoi ──────────────────────────────────────────────────────────
   const send = useCallback(async () => {
     const text = input.trim()
-    if (!text || streaming) return
+    if (!text || typing) return
 
-    const userMsg: ChatMessage = { role: 'user', content: text }
-    const newMessages = [...messages, userMsg]
-    setMessages(newMessages)
-    setInput('')
-    setError(null)
-    setStreaming(true)
-    setPartial('')
-
-    // Top 3 cartes pour aider Prism à personnaliser ses suggestions
+    // Top 3 cartes pour personnaliser les suggestions Prism
     const topCards = [...items]
       .sort((a, b) => b.price - a.price)
       .slice(0, 3)
@@ -116,81 +122,42 @@ export function CoachWidget() {
         price: it.price,
       }))
 
+    const ctx: CoachContext = {
+      balance,
+      inventoryCount: items.length,
+      inventoryValue: totalValue,
+      username: profile.username || 'Dresseur',
+      topCards,
+    }
+
+    const userMsg: ChatMessage = { role: 'user', content: text }
+    const newMessages = [...messages, userMsg]
+    setMessages(newMessages)
+    setInput('')
+    setTyping(true)
+    setPartial('')
+
+    // Génère la réponse localement (synchrone, instantané)
+    const reply = respondLocal(text, ctx)
+
+    // Anime le texte pour le ressenti — l'utilisateur peut couper
     const ctrl = new AbortController()
     abortRef.current = ctrl
 
     try {
-      const res = await fetch('/api/coach/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newMessages,
-          context: {
-            balanceUsd: balance,
-            inventoryCount: items.length,
-            inventoryValueUsd: totalValue,
-            username: profile.username || 'Dresseur',
-            topCards,
-          },
-        }),
-        signal: ctrl.signal,
-      })
-
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { error?: string }
-        throw new Error(data.error ?? `HTTP ${res.status}`)
-      }
-      if (!res.body) throw new Error('Réponse sans body')
-
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-      let accumulated = ''
-
-      while (true) {
-        const { value, done } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-
-        // SSE = events séparés par \n\n, chaque event est `data: {json}`
-        const events = buffer.split('\n\n')
-        buffer = events.pop() ?? ''
-        for (const evt of events) {
-          if (!evt.startsWith('data: ')) continue
-          const json = evt.slice(6)
-          try {
-            const data = JSON.parse(json) as StreamEvent
-            if (data.error) throw new Error(data.error)
-            if (data.delta) {
-              accumulated += data.delta
-              setPartial(accumulated)
-            }
-            if (data.done) {
-              // Persiste l'historique avec la réponse finale
-              const finalMessages: ChatMessage[] = [
-                ...newMessages,
-                { role: 'assistant', content: accumulated },
-              ]
-              setMessages(finalMessages)
-              saveHistory(finalMessages)
-              setPartial('')
-            }
-          } catch (parseErr) {
-            if (parseErr instanceof Error && parseErr.message !== json) {
-              throw parseErr
-            }
-          }
-        }
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') return
-      setError(err instanceof Error ? err.message : 'Erreur inconnue')
-      setPartial('')
+      await typeOut(reply, setPartial, ctrl.signal)
     } finally {
-      setStreaming(false)
+      const finalMessages: ChatMessage[] = [
+        ...newMessages,
+        { role: 'assistant', content: reply },
+      ]
+      setMessages(finalMessages)
+      saveHistory(finalMessages)
+      setPartial('')
+      setTyping(false)
       abortRef.current = null
     }
-  }, [input, messages, streaming, balance, items, totalValue, profile.username])
+  }, [input, messages, typing, balance, items, totalValue, profile.username])
 
   const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -199,10 +166,12 @@ export function CoachWidget() {
     }
   }
 
+  const skipAnimation = () => abortRef.current?.abort()
+
   const reset = () => {
+    abortRef.current?.abort()
     setMessages([])
     setPartial('')
-    setError(null)
     saveHistory([])
   }
 
@@ -213,9 +182,7 @@ export function CoachWidget() {
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Fermer Prism' : 'Ouvrir Prism (coach IA)'}
         className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 group"
-        style={{
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div
           className="relative w-14 h-14 rounded-full flex items-center justify-center transition-transform hover:scale-110"
@@ -223,7 +190,8 @@ export function CoachWidget() {
             background:
               'linear-gradient(140deg, #0A0E14 0%, #1A0F1F 60%, #0A0E14 100%)',
             border: '2px solid rgba(0,212,255,0.4)',
-            boxShadow: '0 0 32px rgba(0,212,255,0.35), inset 0 0 0 1px rgba(255,255,255,0.05)',
+            boxShadow:
+              '0 0 32px rgba(0,212,255,0.35), inset 0 0 0 1px rgba(255,255,255,0.05)',
           }}
         >
           {open ? (
@@ -234,10 +202,7 @@ export function CoachWidget() {
           {!open && hasNew && (
             <span
               className="absolute -top-1 -right-1 w-3 h-3 rounded-full pulse-live"
-              style={{
-                background: '#FFD740',
-                boxShadow: '0 0 8px #FFD740',
-              }}
+              style={{ background: '#FFD740', boxShadow: '0 0 8px #FFD740' }}
               aria-hidden
             />
           )}
@@ -281,7 +246,7 @@ export function CoachWidget() {
                   className="w-1.5 h-1.5 rounded-full pulse-live"
                   style={{ background: '#00FF88', boxShadow: '0 0 6px #00FF88' }}
                 />
-                Coach IA · en ligne
+                Coach · local · zéro latence
               </p>
             </div>
             {messages.length > 0 && (
@@ -312,19 +277,13 @@ export function CoachWidget() {
             {messages.map((m, i) => (
               <Bubble key={i} role={m.role} content={m.content} />
             ))}
-            {partial && <Bubble role="assistant" content={partial} streaming />}
-            {error && (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-sm)] text-[12px]"
-                style={{
-                  background: 'rgba(255,77,94,0.1)',
-                  color: 'var(--color-negative)',
-                  border: '1px solid rgba(255,77,94,0.25)',
-                }}
-              >
-                <AlertCircle size={13} />
-                <span className="flex-1">{error}</span>
-              </div>
+            {partial && (
+              <Bubble
+                role="assistant"
+                content={partial}
+                streaming
+                onClickSkip={skipAnimation}
+              />
             )}
           </div>
 
@@ -345,8 +304,8 @@ export function CoachWidget() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={onKey}
-                placeholder={streaming ? 'Prism répond…' : 'Demande à Prism…'}
-                disabled={streaming}
+                placeholder={typing ? 'Prism répond…' : 'Demande à Prism…'}
+                disabled={typing}
                 rows={1}
                 maxLength={4000}
                 className="flex-1 bg-transparent text-[13px] outline-none resize-none max-h-32 disabled:opacity-50"
@@ -354,17 +313,17 @@ export function CoachWidget() {
               />
               <button
                 onClick={send}
-                disabled={streaming || !input.trim()}
+                disabled={typing || !input.trim()}
                 aria-label="Envoyer"
                 className="flex-shrink-0 w-8 h-8 rounded-[var(--radius-xs)] flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105"
                 style={{
                   background:
-                    streaming || !input.trim()
+                    typing || !input.trim()
                       ? 'rgba(255,255,255,0.06)'
                       : 'linear-gradient(135deg, #2A7DFF, #00D4FF)',
                   color: 'white',
                   boxShadow:
-                    streaming || !input.trim()
+                    typing || !input.trim()
                       ? 'none'
                       : '0 0 12px rgba(0,212,255,0.5)',
                 }}
@@ -376,7 +335,7 @@ export function CoachWidget() {
               className="text-[9.5px] mt-1.5 text-center"
               style={{ color: 'var(--color-text-subtle)' }}
             >
-              Prism est une IA — vérifie les chiffres importants
+              Prism tourne en local — vérifie les chiffres importants
             </p>
           </div>
         </div>
@@ -391,10 +350,12 @@ function Bubble({
   role,
   content,
   streaming,
+  onClickSkip,
 }: {
   role: 'user' | 'assistant'
   content: string
   streaming?: boolean
+  onClickSkip?: () => void
 }) {
   const isUser = role === 'user'
   return (
@@ -403,7 +364,8 @@ function Bubble({
       style={{ justifyContent: isUser ? 'flex-end' : 'flex-start' }}
     >
       <div
-        className="max-w-[85%] px-3 py-2 rounded-[var(--radius-sm)] text-[13px] leading-relaxed"
+        onClick={streaming ? onClickSkip : undefined}
+        className={`max-w-[85%] px-3 py-2 rounded-[var(--radius-sm)] text-[13px] leading-relaxed ${streaming ? 'cursor-pointer' : ''}`}
         style={{
           background: isUser
             ? 'linear-gradient(135deg, rgba(42,125,255,0.18), rgba(0,212,255,0.10))'
@@ -415,6 +377,7 @@ function Bubble({
           whiteSpace: 'pre-wrap',
           wordBreak: 'break-word',
         }}
+        title={streaming ? 'Cliquer pour passer l’animation' : undefined}
       >
         {content}
         {streaming && (
@@ -444,9 +407,9 @@ function Greeting({
   onSuggest: (s: string) => void
 }) {
   const suggestions = [
-    'Quelle caisse j\'ouvre avec mon solde ?',
-    'C\'est rentable de re-grader une carte ?',
-    'Comment fonctionne la roue d\'upgrade ?',
+    'Quelle caisse j’ouvre ?',
+    'Comment marche la roue ?',
+    'C’est rentable de re-grader ?',
   ]
   return (
     <div className="flex flex-col gap-3">
@@ -464,9 +427,9 @@ function Greeting({
         </p>
         <p className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>
           T&apos;as ${balance.toFixed(2)} fictifs et {inventoryCount}{' '}
-          carte{inventoryCount > 1 ? 's' : ''} en inventaire.{' '}
-          Pose-moi une question — proba, stratégie, choix de caisse, je connais
-          tous les chiffres du jeu.
+          carte{inventoryCount > 1 ? 's' : ''} en inventaire. Pose-moi une
+          question — proba, stratégie, choix de caisse, je connais tous les
+          chiffres du jeu.
         </p>
       </div>
       <div className="flex flex-col gap-1.5">
