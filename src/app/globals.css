@@ -1,0 +1,274 @@
+/* ── FONTS — doit précéder @import "tailwindcss" ───────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────────── */
+@theme {
+  /* Backgrounds — couches d'élévation */
+  --color-bg-base:         #050710;
+  --color-bg-surface:      #0B0F1A;
+  --color-bg-elevated:     #11162A;
+  --color-bg-glass:        rgba(255,255,255,0.025);
+  --color-bg-glass-hi:     rgba(255,255,255,0.05);
+  --color-bg-glass-active: rgba(255,255,255,0.08);
+
+  /* Borders — multi-niveaux */
+  --color-border:          rgba(255,255,255,0.06);
+  --color-border-strong:   rgba(255,255,255,0.12);
+  --color-border-bright:   rgba(255,255,255,0.18);
+
+  /* Text */
+  --color-text-primary:    #F8FAFC;
+  --color-text-secondary:  rgba(248,250,252,0.62);
+  --color-text-muted:      rgba(248,250,252,0.32);
+  --color-text-subtle:     rgba(248,250,252,0.18);
+
+  /* Sémantique */
+  --color-positive:        #10D9A0;
+  --color-positive-soft:   rgba(16,217,160,0.12);
+  --color-positive-glow:   rgba(16,217,160,0.35);
+  --color-negative:        #FF4D5E;
+  --color-negative-soft:   rgba(255,77,94,0.12);
+  --color-negative-glow:   rgba(255,77,94,0.35);
+  --color-warning:         #F5A623;
+  --color-warning-soft:    rgba(245,166,35,0.12);
+
+  /* Brand — Bleu électrique Pokémon */
+  --color-brand:           #2A7DFF;
+  --color-brand-hi:        #5AA0FF;
+  --color-brand-soft:      rgba(42,125,255,0.15);
+  --color-brand-glow:      rgba(42,125,255,0.45);
+
+  /* Accents secondaires */
+  --color-cyan:            #00D4FF;
+  --color-cyan-soft:       rgba(0,212,255,0.13);
+  --color-purple:          #8B5CF6;
+  --color-purple-soft:     rgba(139,92,246,0.13);
+  --color-pink:            #EC4899;
+  --color-pink-soft:       rgba(236,72,153,0.13);
+  --color-pokemon-yellow:  #FFCC00;
+  --color-pokemon-yellow-soft: rgba(255,204,0,0.15);
+
+  /* Énergies Pokémon — pour rapidité d'usage */
+  --color-energy-fire:      #FF6B47;
+  --color-energy-water:     #4FA3FF;
+  --color-energy-grass:     #7BCB68;
+  --color-energy-lightning: #FFD43B;
+  --color-energy-psychic:   #C77DFF;
+  --color-energy-fighting:  #C76040;
+  --color-energy-dark:      #424B5F;
+  --color-energy-metal:     #94A3B8;
+  --color-energy-fairy:     #F8A5C2;
+  --color-energy-dragon:    #6B5BA8;
+  --color-energy-colorless: #A8B2C0;
+
+  /* Typographie */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+  --font-body:    'Inter', sans-serif;
+
+  /* Radius */
+  --radius-xs:   6px;
+  --radius-sm:   8px;
+  --radius:      12px;
+  --radius-md:   14px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+
+  /* Shadows — élévation crédible */
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm:   0 2px 6px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.25);
+  --shadow-lg:   0 12px 32px rgba(0,0,0,0.55), 0 4px 8px rgba(0,0,0,0.3);
+  --shadow-xl:   0 24px 60px rgba(0,0,0,0.65), 0 8px 16px rgba(0,0,0,0.35);
+  --shadow-glow-brand: 0 0 32px var(--color-brand-glow);
+}
+
+/* ── RESET & BASE ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100%;
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+}
+
+/* ── ATMOSPHERIC BACKGROUND ─────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    /* Halos colorés multi-couches */
+    radial-gradient(ellipse 70% 50% at 0% 0%,     rgba(42,125,255,0.22) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgba(0,212,255,0.10)  0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 90% 10%,   rgba(255,204,0,0.05)  0%, transparent 55%),
+    radial-gradient(ellipse 35% 30% at 10% 90%,   rgba(139,92,246,0.06) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grain texture subtil */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* Contenu au-dessus des pseudo-éléments */
+#__next, main { position: relative; z-index: 1; }
+
+/* ── SCROLLBAR ───────────────────────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar       { width: 6px; height: 6px; }
+*::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 3px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--color-border-bright); }
+
+/* ── TABULAR NUMBERS ─────────────────────────────────────────────────── */
+.font-mono, [class*="font-mono"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── FOCUS RING ─────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ── SELECTION ──────────────────────────────────────────────────────── */
+::selection {
+  background: var(--color-brand-soft);
+  color: var(--color-text-primary);
+}
+
+/* ── UTILS ──────────────────────────────────────────────────────────── */
+.glass {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+}
+
+.glass-hi {
+  background: var(--color-bg-glass-hi);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-border-strong);
+}
+
+/* Card shimmer animation pour skeletons */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-glass) 25%,
+    var(--color-bg-glass-hi) 50%,
+    var(--color-bg-glass) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Pulse pour live data */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-live {
+  animation: pulse-live 1.6s ease-in-out infinite;
+}
+
+/* Gradient text pour titres premium */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-text-secondary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-strong);
+}
+
+/* ── PAGE ENTRY ANIMATION ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: fadeInUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Stagger pour enfants */
+.stagger-children > * {
+  animation: fadeInUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+
+/* ── NATIVE SELECT DARK THEME ───────────────────────────────────────── */
+select {
+  color-scheme: dark;
+}
+
+/* ── INPUT / TEXTAREA FOCUS STATE ────────────────────────────────── */
+input:focus, textarea:focus {
+  border-color: var(--color-border-strong) !important;
+}
+
+/* Date input cursor color */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.6);
+  cursor: pointer;
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .shimmer { animation: none; background: var(--color-bg-glass-hi); }
+  .pulse-live { animation: none; }
+  .page-enter { animation: none; }
+}

@@ -1,0 +1,8 @@
+pre-commit:
+  commands:
+    lint:
+      glob: "*.{ts,tsx}"
+      run: npx eslint {staged_files} --max-warnings 0
+    format:
+      glob: "*.{ts,tsx,json,md}"
+      run: npx prettier --write {staged_files}
