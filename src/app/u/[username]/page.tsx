@@ -4,6 +4,7 @@ import { CollectionCard } from "@/components/cards/CollectionCard";
 import { fetchPublicProfile, fetchPublicCollection } from "@/lib/data/public";
 import { formatEur } from "@/utils/formatCurrency";
 import { Heart, Eye, Share2, Sparkles } from "lucide-react";
+import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
 import { env } from "@/constants/env";
 import type { MockCard } from "@/lib/mock";
 import type { UserCardRow } from "@/lib/data/cards";
@@ -124,24 +125,9 @@ function PublicProfileLayout({
         }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-[8px] flex items-center justify-center text-white text-[11px] font-extrabold"
-              style={{
-                fontFamily: "var(--font-display)",
-                background:
-                  "linear-gradient(140deg, var(--color-brand), var(--color-cyan))",
-                boxShadow: "0 0 12px var(--color-brand-glow)",
-              }}
-            >
-              GF
-            </div>
-            <span
-              className="text-[13px] font-bold"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              GameFolio
-            </span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <LogoMark size={30} alt="" />
+            <LogoWordmark height={18} />
           </Link>
           <Link
             href="/signup"

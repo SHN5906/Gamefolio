@@ -1,0 +1,17 @@
+{
+  "name": "GameFolio — Casino TCG fictif",
+  "short_name": "GameFolio",
+  "description": "Le casino TCG en monnaie fictive. Caisses, roue d'upgrade, battles PvP, jackpot.",
+  "start_url": "/game",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A0E14",
+  "theme_color": "#0A0E14",
+  "orientation": "portrait-primary",
+  "lang": "fr-FR",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "/icon",        "sizes": "32x32",   "type": "image/png" },
+    { "src": "/apple-icon",  "sizes": "180x180", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

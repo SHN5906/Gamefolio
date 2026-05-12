@@ -1,100 +1,100 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { CardArt } from '@/components/cards/CardArt'
-import { User, Mail, Lock, ArrowRight, Check } from 'lucide-react'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { CardArt } from "@/components/cards/CardArt";
+import { User, Mail, Lock, ArrowRight, Check } from "lucide-react";
+import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
 
 const schema = z.object({
-  name:     z.string().min(2, '2 caractères minimum'),
-  email:    z.string().email('Email invalide'),
+  name: z.string().min(2, "2 caractères minimum"),
+  email: z.string().email("Email invalide"),
   password: z
     .string()
-    .min(8, '8 caractères minimum')
-    .regex(/[A-Z]/, 'Une majuscule requise')
-    .regex(/[0-9]/, 'Un chiffre requis'),
-})
-type FormData = z.infer<typeof schema>
+    .min(8, "8 caractères minimum")
+    .regex(/[A-Z]/, "Une majuscule requise")
+    .regex(/[0-9]/, "Un chiffre requis"),
+});
+type FormData = z.infer<typeof schema>;
 
 const FEATURES = [
-  '$10 fictifs offerts à l\'inscription',
-  '15 caisses thématiques (Kanto, Neo, Shinings, Cristaux…)',
-  'Battles PvP, jackpot, roue d\'upgrade, regrade',
-  '100% monnaie fictive · Aucune CB requise',
-]
+  "$10 fictifs offerts à l'inscription",
+  "15 caisses thématiques (Kanto, Neo, Shinings, Cristaux…)",
+  "Battles PvP, jackpot, roue d'upgrade, regrade",
+  "100% monnaie fictive · Aucune CB requise",
+];
 
 export default function SignupPage() {
-  const router = useRouter()
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [loading, setLoading]     = useState(false)
+  const router = useRouter();
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-  })
+  });
 
   const onSubmit = async (data: FormData) => {
-    setLoading(true)
-    setAuthError(null)
+    setLoading(true);
+    setAuthError(null);
 
     // Mode démo sans Supabase
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      router.push('/game')
-      return
+      router.push("/game");
+      return;
     }
 
-    const supabase = createClient()
+    const supabase = createClient();
     const { error } = await supabase.auth.signUp({
-      email:    data.email,
+      email: data.email,
       password: data.password,
       options: { data: { display_name: data.name } },
-    })
+    });
 
     if (error) {
-      setAuthError(error.message)
-      setLoading(false)
-      return
+      setAuthError(error.message);
+      setLoading(false);
+      return;
     }
 
-    router.push('/login?confirm=1')
-  }
+    router.push("/login?confirm=1");
+  };
 
   return (
-    <div className="w-full max-w-[800px] grid gap-12" style={{ gridTemplateColumns: '1fr 1fr' }}>
-
+    <div
+      className="w-full max-w-[800px] grid gap-12"
+      style={{ gridTemplateColumns: "1fr 1fr" }}
+    >
       {/* ── GAUCHE : PITCH ────────────────────────────── */}
       <div className="flex flex-col justify-center">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-10">
-          <div
-            className="w-9 h-9 rounded-[9px] flex items-center justify-center text-white text-[13px] font-bold flex-shrink-0"
-            style={{
-              fontFamily: 'var(--font-display)',
-              background: 'linear-gradient(140deg, var(--color-brand), #4F46E5)',
-              boxShadow: '0 0 24px var(--color-brand-glow)',
-            }}
-          >
-            GF
-          </div>
-          <span className="text-[17px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            GameFolio
-          </span>
+          <LogoMark size={40} alt="" />
+          <LogoWordmark height={22} />
         </div>
 
         <h2
           className="text-[28px] font-bold leading-tight tracking-tight mb-3"
-          style={{ fontFamily: 'var(--font-display)' }}
+          style={{ fontFamily: "var(--font-display)" }}
         >
           Ouvre ta première caisse en 30 secondes.
         </h2>
-        <p className="text-[13px] mb-7" style={{ color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-          Le casino TCG en monnaie fictive. Aucun argent réel, aucune CB. Que du fun.
+        <p
+          className="text-[13px] mb-7"
+          style={{ color: "var(--color-text-muted)", lineHeight: 1.6 }}
+        >
+          Le casino TCG en monnaie fictive. Aucun argent réel, aucune CB. Que du
+          fun.
         </p>
 
         {/* Features */}
@@ -103,18 +103,27 @@ export default function SignupPage() {
             <div key={f} className="flex items-center gap-2.5">
               <span
                 className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: 'var(--color-positive-soft)' }}
+                style={{ background: "var(--color-positive-soft)" }}
               >
-                <Check size={9} style={{ color: 'var(--color-positive)' }} strokeWidth={3} />
+                <Check
+                  size={9}
+                  style={{ color: "var(--color-positive)" }}
+                  strokeWidth={3}
+                />
               </span>
-              <span className="text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>{f}</span>
+              <span
+                className="text-[13px]"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {f}
+              </span>
             </div>
           ))}
         </div>
 
         {/* Cartes déco */}
         <div className="flex gap-2 items-end">
-          {(['dark', 'fire', 'water', 'lightning'] as const).map((e, i) => (
+          {(["dark", "fire", "water", "lightning"] as const).map((e, i) => (
             <div
               key={e}
               className="transition-transform duration-300"
@@ -134,26 +143,35 @@ export default function SignupPage() {
         <div
           className="rounded-[var(--radius-lg)] border p-6"
           style={{
-            background: 'var(--color-bg-glass)',
-            borderColor: 'var(--color-border)',
-            backdropFilter: 'blur(24px)',
+            background: "var(--color-bg-glass)",
+            borderColor: "var(--color-border)",
+            backdropFilter: "blur(24px)",
           }}
         >
-          <h1 className="text-[20px] font-bold mb-0.5 tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1
+            className="text-[20px] font-bold mb-0.5 tracking-tight"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Créer un compte
           </h1>
-          <p className="text-[13px] mb-5" style={{ color: 'var(--color-text-muted)' }}>
+          <p
+            className="text-[13px] mb-5"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             $10 fictifs offerts · 18+ · Sans CB
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-3.5"
+          >
             <Input
               label="Prénom"
               placeholder="Hugo"
               autoComplete="given-name"
               icon={<User size={14} />}
               error={errors.name?.message}
-              {...register('name')}
+              {...register("name")}
             />
             <Input
               label="Email"
@@ -162,7 +180,7 @@ export default function SignupPage() {
               autoComplete="email"
               icon={<Mail size={14} />}
               error={errors.email?.message}
-              {...register('email')}
+              {...register("email")}
             />
             <Input
               label="Mot de passe"
@@ -171,36 +189,56 @@ export default function SignupPage() {
               autoComplete="new-password"
               icon={<Lock size={14} />}
               error={errors.password?.message}
-              {...register('password')}
+              {...register("password")}
             />
 
             {authError && (
-              <p className="text-[12px]" style={{ color: 'var(--color-negative)' }}>
+              <p
+                className="text-[12px]"
+                style={{ color: "var(--color-negative)" }}
+              >
                 {authError}
               </p>
             )}
 
-            <Button type="submit" loading={loading} className="w-full mt-1 justify-center">
+            <Button
+              type="submit"
+              loading={loading}
+              className="w-full mt-1 justify-center"
+            >
               Créer mon compte
               {!loading && <ArrowRight size={14} />}
             </Button>
           </form>
 
-          <p className="text-[11px] text-center mt-4" style={{ color: 'var(--color-text-muted)' }}>
-            En créant un compte, tu acceptes nos{' '}
-            <span className="underline cursor-pointer" style={{ color: 'var(--color-brand)' }}>
+          <p
+            className="text-[11px] text-center mt-4"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            En créant un compte, tu acceptes nos{" "}
+            <span
+              className="underline cursor-pointer"
+              style={{ color: "var(--color-brand)" }}
+            >
               CGU
             </span>
           </p>
         </div>
 
-        <p className="text-center text-[12px] mt-4" style={{ color: 'var(--color-text-muted)' }}>
-          Déjà un compte ?{' '}
-          <Link href="/login" className="font-medium" style={{ color: 'var(--color-brand)' }}>
+        <p
+          className="text-center text-[12px] mt-4"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          Déjà un compte ?{" "}
+          <Link
+            href="/login"
+            className="font-medium"
+            style={{ color: "var(--color-brand)" }}
+          >
             Se connecter
           </Link>
         </p>
       </div>
     </div>
-  )
+  );
 }
