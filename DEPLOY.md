@@ -46,10 +46,10 @@ renvoie vers `/signup` mais ne déclenche pas de paiement.
 
 ## Phase 4 — Resend (emails) + PostHog + Sentry
 
-* **Resend** : crée un domaine vérifié `gamefolio.app`, copie `RESEND_API_KEY`.
-* **PostHog EU** : projet EU, copie la clé publique. Le SDK est déjà installé,
+- **Resend** : crée un domaine vérifié `gamefolio.app`, copie `RESEND_API_KEY`.
+- **PostHog EU** : projet EU, copie la clé publique. Le SDK est déjà installé,
   reste à wrap l'app dans `<PostHogProvider>` (à faire — Phase 5).
-* **Sentry** : projet `gamefolio`, copie le DSN. Wrap via `withSentryConfig` dans
+- **Sentry** : projet `gamefolio`, copie le DSN. Wrap via `withSentryConfig` dans
   `next.config.ts` (à faire — Phase 5).
 
 ## Phase 5 — Travaux restants pour vraiment release-ready
@@ -73,7 +73,7 @@ client** (localStorage). N'importe quel utilisateur ouvre la console et appelle
 2. Côté client : remplacer les appels directs aux fonctions locales par des
    appels `supabase.functions.invoke('open-pack', { body: { packId } })`.
 3. L'animation client (CaseOpener, UpgradeWheel) reste — elle ne fait que
-   *mimer* la convergence vers le résultat retourné par le serveur.
+   _mimer_ la convergence vers le résultat retourné par le serveur.
 
 ### 5.b — Migrer l'inventaire de localStorage vers Supabase
 
@@ -84,10 +84,12 @@ La migration v1→v2 SQL (`20260512000000_graded_items.sql §10`) est prête.
 ### 5.c — Brancher PostHog + Sentry
 
 Wrapper dans `src/app/layout.tsx` :
+
 ```tsx
 <PostHogProvider>{children}</PostHogProvider>
 ```
-+ `Sentry.init` dans `instrumentation.ts` (Next 15+).
+
+- `Sentry.init` dans `instrumentation.ts` (Next 15+).
 
 ### 5.d — Middleware géo-blocage
 
@@ -109,17 +111,19 @@ le logo GF + screenshot d'ouverture de caisse. Référencé dans `metadataBase`.
 ### 5.g — Anti-triche / rate limiting
 
 Sur les Edge Functions :
-* Limiter à N requêtes par seconde par utilisateur (Upstash Redis recommandé).
-* Logger toute tentative > 10/sec comme suspicieuse.
-* Captcha (hCaptcha/Turnstile) sur signup pour bloquer les bots multi-comptes.
+
+- Limiter à N requêtes par seconde par utilisateur (Upstash Redis recommandé).
+- Logger toute tentative > 10/sec comme suspicieuse.
+- Captcha (hCaptcha/Turnstile) sur signup pour bloquer les bots multi-comptes.
 
 ### 5.h — Tests d'intégration
 
 Au minimum :
-* Test du `rollPackOutcome` sur 100 k tirages, vérifier la distribution
+
+- Test du `rollPackOutcome` sur 100 k tirages, vérifier la distribution
   ≤ 1% d'écart vs les drop rates.
-* Test du wheel : `clampedProbability(stake, target)` == probabilité observée.
-* Test du regrade : EV par grade dans la fourchette attendue.
+- Test du wheel : `clampedProbability(stake, target)` == probabilité observée.
+- Test du regrade : EV par grade dans la fourchette attendue.
 
 ### 5.i — i18n EN
 
@@ -129,13 +133,13 @@ Tradire `fr` → `en`, garder `fr` par défaut sur `gamefolio.app/fr` et
 
 ## Objectif 1 M MAU — checklist marketing & SEO
 
-* Une landing par caisse indexable (`/game/open/[packId]` — déjà dans le sitemap)
-* OG personnalisée par caisse (à faire — `generateMetadata`)
-* Programme de parrainage : `/r/[code]` (Phase 2)
-* Leaderboard public top wins + top streak (Phase 2)
-* Contenu : 1 article/semaine "Top 10 cartes les plus rares du set X"
-* Discord communauté (linker dans le footer)
-* Partenariats créateurs TCG sur YouTube/TikTok (commission par signup converti)
+- Une landing par caisse indexable (`/game/open/[packId]` — déjà dans le sitemap)
+- OG personnalisée par caisse (à faire — `generateMetadata`)
+- Programme de parrainage : `/r/[code]` (Phase 2)
+- Leaderboard public top wins + top streak (Phase 2)
+- Contenu : 1 article/semaine "Top 10 cartes les plus rares du set X"
+- Discord communauté (linker dans le footer)
+- Partenariats créateurs TCG sur YouTube/TikTok (commission par signup converti)
 
 ---
 

@@ -68,13 +68,14 @@
   --font-mono:    'IBM Plex Mono', monospace;
   --font-body:    'Inter', sans-serif;
 
-  /* Radius */
-  --radius-xs:   6px;
-  --radius-sm:   8px;
-  --radius:      12px;
-  --radius-md:   14px;
-  --radius-lg:   18px;
-  --radius-xl:   24px;
+  /* Radius — tightened (-33% vs portfolio era) pour un feel casino plus sharp
+     comme Hellcase/Roobet/CSGOEmpire. Évite le look "Notion/Linear" trop rond. */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius:      8px;
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
 
   /* Shadows — élévation crédible */
   --shadow-xs:   0 1px 2px rgba(0,0,0,0.3);
@@ -261,6 +262,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+/* ── TICKER (Live wins scrolling band) ──────────────────────────────── */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker-scroll 90s linear infinite;
+  width: max-content;
+  will-change: transform;
+}
+.animate-ticker:hover { animation-play-state: paused; }
+
+/* ── JACKPOT NUMBER FLICKER (subtle, simulates live update) ─────────── */
+@keyframes jackpot-flicker {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.92; }
+}
+.animate-jackpot-flicker {
+  animation: jackpot-flicker 2.4s ease-in-out infinite;
+}
+
 /* ── REDUCED MOTION ─────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -271,4 +293,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .shimmer { animation: none; background: var(--color-bg-glass-hi); }
   .pulse-live { animation: none; }
   .page-enter { animation: none; }
+  .animate-ticker { animation: none; }
+  .animate-jackpot-flicker { animation: none; }
 }

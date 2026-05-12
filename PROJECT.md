@@ -30,24 +30,24 @@ partageable avec dignité. Cette vision est désormais abandonnée.
 
 ## Stack — versions exactes proposées
 
-| Couche | Techno | Version |
-|---|---|---|
-| Framework | **Next.js** (App Router) | 15.x |
-| Langage | **TypeScript** strict | 5.x |
-| UI | **Tailwind CSS v4** | 4.x |
-| Composants | Primitives maison (`src/components/ui/`) | — |
-| Animations | **Framer Motion** | 11.x |
-| Charts | **Recharts** | 2.x |
-| State client | **Zustand** | 5.x |
-| State serveur | **TanStack Query v5** | 5.x |
-| Backend / BDD | **Supabase** (Postgres + Auth + Edge Functions + Storage) | SDK 2.x |
-| Auth | Supabase Auth + **NextAuth v5** (optionnel Google/GitHub OAuth) | 5.x |
-| Paiements | **Stripe** (Checkout + Customer Portal + Webhooks) | SDK 17.x |
-| Notifs | **Resend** (emails transactionnels) | SDK 4.x |
-| Analytics | **PostHog** | 1.x |
-| Crash reporting | **Sentry** | 8.x |
-| Lint / format | **ESLint** (config Next.js) + **Prettier** | — |
-| Git hooks | **Lefthook** | — |
+| Couche          | Techno                                                          | Version  |
+| --------------- | --------------------------------------------------------------- | -------- |
+| Framework       | **Next.js** (App Router)                                        | 15.x     |
+| Langage         | **TypeScript** strict                                           | 5.x      |
+| UI              | **Tailwind CSS v4**                                             | 4.x      |
+| Composants      | Primitives maison (`src/components/ui/`)                        | —        |
+| Animations      | **Framer Motion**                                               | 11.x     |
+| Charts          | **Recharts**                                                    | 2.x      |
+| State client    | **Zustand**                                                     | 5.x      |
+| State serveur   | **TanStack Query v5**                                           | 5.x      |
+| Backend / BDD   | **Supabase** (Postgres + Auth + Edge Functions + Storage)       | SDK 2.x  |
+| Auth            | Supabase Auth + **NextAuth v5** (optionnel Google/GitHub OAuth) | 5.x      |
+| Paiements       | **Stripe** (Checkout + Customer Portal + Webhooks)              | SDK 17.x |
+| Notifs          | **Resend** (emails transactionnels)                             | SDK 4.x  |
+| Analytics       | **PostHog**                                                     | 1.x      |
+| Crash reporting | **Sentry**                                                      | 8.x      |
+| Lint / format   | **ESLint** (config Next.js) + **Prettier**                      | —        |
+| Git hooks       | **Lefthook**                                                    | —        |
 
 ---
 
@@ -126,11 +126,13 @@ src/
 ## Dépendances — liste complète avec justification
 
 ### Core
+
 - `next@15` — App Router, Server Components, Route Handlers, streaming
 - `react@19` + `react-dom@19` — peer deps Next.js 15
 - `typescript@5` — strict mode
 
 ### UI / Styling
+
 - `tailwindcss@4` — utility-first, configuration design tokens
 - `framer-motion@11` — animations fluides (transitions pages, sparkline)
 - `lucide-react` — icônes cohérentes, tree-shakable
@@ -138,29 +140,36 @@ src/
 - `clsx` + `tailwind-merge` — composition className sans conflits
 
 ### State / Data
+
 - `@tanstack/react-query@5` — cache serveur, optimistic updates, refetch
 - `zustand@5` — state client léger (session, préférences)
 
 ### Backend
+
 - `@supabase/supabase-js@2` — client Supabase (BDD, Auth, Storage)
 - `@supabase/ssr` — helpers Next.js pour cookies Supabase côté serveur
 
 ### Paiements
+
 - `stripe@17` — SDK serveur Stripe (webhooks, Checkout Session)
 - `@stripe/stripe-js` — SDK client (redirection Checkout)
 
 ### Communication
+
 - `resend@4` — emails transactionnels (bienvenue, alertes prix)
 
 ### Formulaires / Validation
+
 - `react-hook-form@7` — gestion formulaires (ajout carte, signup)
 - `zod@3` — validation schéma (forms + API routes)
 
 ### Monitoring
+
 - `@sentry/nextjs@8` — crash reporting
 - `posthog-js` — analytics produit, funnels, sessions
 
 ### Dev / Qualité
+
 - `eslint` + `eslint-config-next` — linting
 - `prettier` — formatting
 - `lefthook` — git hooks (lint + format avant commit)
@@ -202,35 +211,35 @@ SENTRY_AUTH_TOKEN=
 ```ts
 export const colors = {
   bg: {
-    base: '#0A0E14',
-    surface: '#131820',
-    surfaceElev: '#1B2230',
-    surfaceHi: '#232A3A',
+    base: "#0A0E14",
+    surface: "#131820",
+    surfaceElev: "#1B2230",
+    surfaceHi: "#232A3A",
   },
   border: {
-    DEFAULT: '#252C3A',
-    strong: '#313A4D',
+    DEFAULT: "#252C3A",
+    strong: "#313A4D",
   },
   text: {
-    primary: '#F4F5F7',
-    secondary: '#B8BFCC',
-    muted: '#8B92A5',
-    dim: '#5A6275',
+    primary: "#F4F5F7",
+    secondary: "#B8BFCC",
+    muted: "#8B92A5",
+    dim: "#5A6275",
   },
   accent: {
-    positive: '#00D68F',
-    negative: '#FF5577',
-    warning: '#E8B339',
+    positive: "#00D68F",
+    negative: "#FF5577",
+    warning: "#E8B339",
   },
   brand: {
-    DEFAULT: '#5B7FFF',
-    hi: '#7B97FF',
+    DEFAULT: "#5B7FFF",
+    hi: "#7B97FF",
   },
 } as const;
 
 export const fontFamily = {
-  display: ['Inter Tight', 'sans-serif'],
-  body: ['Inter', 'sans-serif'],
+  display: ["Inter Tight", "sans-serif"],
+  body: ["Inter", "sans-serif"],
 };
 ```
 
@@ -249,10 +258,10 @@ export const fontFamily = {
 
 ## Roadmap des étapes de build
 
-| Étape | Contenu | Statut |
-|---|---|---|
-| 1 | Ce fichier PROJECT.md | ✅ |
-| 2 | Init Next.js + install deps + scaffold structure | ⏳ |
-| 3 | Design tokens + Tailwind config + composants ui/ | ⏳ |
-| 4 | Supabase client + auth screens + layout app | ⏳ |
-| 5 | Dashboard avec HeroValueCard mockée | ⏳ |
+| Étape | Contenu                                          | Statut |
+| ----- | ------------------------------------------------ | ------ |
+| 1     | Ce fichier PROJECT.md                            | ✅     |
+| 2     | Init Next.js + install deps + scaffold structure | ⏳     |
+| 3     | Design tokens + Tailwind config + composants ui/ | ⏳     |
+| 4     | Supabase client + auth screens + layout app      | ⏳     |
+| 5     | Dashboard avec HeroValueCard mockée              | ⏳     |

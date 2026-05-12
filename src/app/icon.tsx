@@ -1,52 +1,54 @@
-import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { ImageResponse } from 'next/og'
 
-// Convention Next.js : ce fichier devient le favicon servi à `/icon`.
-// On lit le PNG du prisme depuis `public/logo-mark.png` au moment du
-// rendu et on le pose sur un fond solide pour rester lisible dans
-// l'onglet du navigateur (le fond transparent du PNG donnerait juste
-// un halo flou à 32×32).
-export const runtime = "nodejs";
-export const size = { width: 32, height: 32 };
-export const contentType = "image/png";
+// Favicon 32×32 — SVG prism rendu inline, posé sur un fond dark navy
+// pour rester lisible dans l'onglet du navigateur. Pas de readFile,
+// pas de PNG externe : 100% Edge-compatible.
+export const runtime = 'edge'
+export const size = { width: 32, height: 32 }
+export const contentType = 'image/png'
 
-async function loadMark(): Promise<string | null> {
-  try {
-    const buf = await readFile(join(process.cwd(), "public/logo-mark.png"));
-    return `data:image/png;base64,${buf.toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
+const TOP_FACET = '60,12 101.6,36 60,60 18.4,36'
+const RIGHT_FACET = '101.6,36 101.6,84 60,108 60,60'
+const LEFT_FACET = '18.4,36 60,60 60,108 18.4,84'
 
-export default async function Icon() {
-  const mark = await loadMark();
+export default function Icon() {
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "#0A0E14",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 6,
-      }}
-    >
-      {mark ? (
-        <img src={mark} width={28} height={28} alt="" />
-      ) : (
-        <div
-          style={{
-            width: 22,
-            height: 22,
-            background: "linear-gradient(135deg, #2A7DFF, #00D4FF)",
-            borderRadius: 4,
-          }}
-        />
-      )}
-    </div>,
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: '#0A0E14',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 6,
+        }}
+      >
+        <svg width="26" height="26" viewBox="0 0 120 120" fill="none">
+          <defs>
+            <linearGradient id="t" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#00E5FF" />
+              <stop offset="55%" stopColor="#FF4DA6" />
+              <stop offset="100%" stopColor="#FFD740" />
+            </linearGradient>
+            <linearGradient id="r" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#2A7DFF" />
+              <stop offset="50%" stopColor="#A36AFF" />
+              <stop offset="100%" stopColor="#FF4DA6" />
+            </linearGradient>
+            <linearGradient id="l" x1="50%" y1="0%" x2="50%" y2="100%">
+              <stop offset="0%" stopColor="#FF4DA6" />
+              <stop offset="55%" stopColor="#00D4FF" />
+              <stop offset="100%" stopColor="#FFD740" />
+            </linearGradient>
+          </defs>
+          <polygon points={TOP_FACET}   fill="url(#t)" stroke="white" strokeWidth="2.2" />
+          <polygon points={RIGHT_FACET} fill="url(#r)" stroke="white" strokeWidth="2.2" />
+          <polygon points={LEFT_FACET}  fill="url(#l)" stroke="white" strokeWidth="2.2" />
+        </svg>
+      </div>
+    ),
     size,
-  );
+  )
 }

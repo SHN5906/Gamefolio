@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
+import { LiveWinsTicker } from "@/components/game/LiveWinsTicker";
+import { JackpotCounter } from "@/components/game/JackpotCounter";
 import {
   Package,
   Target,
@@ -11,6 +13,7 @@ import {
   ArrowUpRight,
   Sparkles,
   ShieldCheck,
+  Zap,
 } from "lucide-react";
 
 export const metadata = {
@@ -92,317 +95,125 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
-      <section className="px-6 md:px-10 pt-16 md:pt-24 pb-16">
-        <div className="max-w-6xl mx-auto text-center">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold mb-6 border"
-            style={{
-              background: "var(--color-brand-soft)",
-              borderColor: "rgba(42,125,255,0.3)",
-              color: "var(--color-brand-hi)",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full pulse-live"
-              style={{ background: "var(--color-positive)" }}
-            />
-            Live · 1 247 joueurs en ligne
-          </div>
+      {/* ── LIVE WINS TICKER (sous nav, full-width) ─────────────── */}
+      <LiveWinsTicker />
 
-          <h1
-            className="text-[40px] md:text-[68px] font-extrabold tracking-tight leading-[1.05] mb-5"
-            style={{
-              fontFamily: "var(--font-display)",
-              letterSpacing: "-0.035em",
-            }}
-          >
-            Ouvre des caisses TCG.
-            <br />
-            <span className="gradient-text">Sans débourser un centime.</span>
-          </h1>
-
-          <p
-            className="text-[16px] md:text-[18px] max-w-2xl mx-auto leading-relaxed mb-8"
-            style={{ color: "var(--color-text-secondary)" }}
-          >
-            Le casino TCG en monnaie fictive. Ouvre des caisses, joue à la roue
-            d&apos;upgrade, défie d&apos;autres joueurs en battle PvP. $10
-            offerts dès la création du compte.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-            <Link
-              href="/game"
-              className="flex items-center gap-2 h-12 px-6 rounded-[var(--radius-sm)] text-[14px] font-bold text-white transition-all hover:-translate-y-0.5"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--color-brand), var(--color-cyan))",
-                boxShadow: "0 0 24px var(--color-brand-glow)",
-              }}
-            >
-              Ouvrir ma première caisse
-              <ArrowRight size={14} />
-            </Link>
-            <Link
-              href="#features"
-              className="flex items-center gap-2 h-12 px-6 rounded-[var(--radius-sm)] text-[14px] font-semibold border transition-colors"
-              style={{
-                background: "var(--color-bg-glass)",
-                borderColor: "var(--color-border)",
-                color: "var(--color-text-primary)",
-              }}
-            >
-              Voir les modes de jeu
-              <ArrowUpRight size={14} />
-            </Link>
-          </div>
-
-          <p
-            className="text-[12px]"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            100% monnaie fictive · Aucune CB requise · 18+ · Conforme loi
-            française
-          </p>
-        </div>
-
-        {/* Hero mockup — feed live wins (à la Hellcase) */}
-        <div className="max-w-5xl mx-auto mt-16 relative">
-          <div
-            className="absolute -inset-4 rounded-[32px] pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(42,125,255,0.18) 0%, transparent 70%)",
-            }}
-          />
-          <div
-            className="relative rounded-[var(--radius-lg)] border overflow-hidden"
-            style={{
-              background: "rgba(11,15,26,0.85)",
-              borderColor: "var(--color-border-strong)",
-              boxShadow:
-                "0 32px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)",
-              backdropFilter: "blur(20px)",
-            }}
-          >
+      {/* ── HERO (asymmetric : text left, jackpot right) ───────────── */}
+      <section className="px-6 md:px-10 pt-12 md:pt-16 pb-16">
+        <div className="max-w-6xl mx-auto grid gap-10 lg:gap-14 lg:grid-cols-[1.1fr_1fr] items-center">
+          {/* LEFT — text + CTAs */}
+          <div>
             <div
-              className="absolute inset-x-0 top-0 h-px"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-bold mb-6 border uppercase tracking-[1.5px]"
               style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(42,125,255,0.5), rgba(0,212,255,0.3), transparent)",
+                background: "rgba(0,255,140,0.06)",
+                borderColor: "rgba(0,255,140,0.3)",
+                color: "#00FF88",
               }}
-            />
-
-            {/* Faux navigateur */}
-            <div
-              className="flex items-center gap-2 px-4 py-3 border-b"
-              style={{ borderColor: "var(--color-border)" }}
             >
-              <div className="flex gap-1.5">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ background: "var(--color-negative)" }}
-                />
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ background: "var(--color-warning)" }}
-                />
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ background: "var(--color-positive)" }}
-                />
-              </div>
-              <div className="flex-1 flex justify-center">
-                <div
-                  className="h-5 w-48 rounded-full flex items-center justify-center gap-1.5 border px-3"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    borderColor: "var(--color-border)",
-                  }}
-                >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "var(--color-positive)" }}
-                  />
-                  <span
-                    className="text-[10px]"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    gamefolio.app/game
-                  </span>
-                </div>
-              </div>
+              <span
+                className="w-1.5 h-1.5 rounded-full pulse-live"
+                style={{ background: "#00FF88", boxShadow: "0 0 8px #00FF88" }}
+              />
+              1 247 joueurs en ligne · maintenant
             </div>
 
-            <div className="p-5 md:p-7">
-              {/* Bandeau top : derniers gains */}
-              <div
-                className="rounded-[var(--radius-md)] border p-4 mb-4"
+            <h1
+              className="text-[44px] md:text-[72px] font-extrabold tracking-tight leading-[1.02] mb-5"
+              style={{
+                fontFamily: "var(--font-display)",
+                letterSpacing: "-0.04em",
+              }}
+            >
+              Ouvre des caisses.
+              <br />
+              <span className="gradient-text italic">Pas ta CB.</span>
+            </h1>
+
+            <p
+              className="text-[16px] md:text-[18px] max-w-xl leading-relaxed mb-7"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Le casino TCG en monnaie fictive — caisses, roue d&apos;upgrade,
+              battles PvP, jackpot communautaire. $10 fictifs offerts à
+              l&apos;inscription. Aucune CB, jamais.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+              <Link
+                href="/game"
+                className="flex items-center gap-2 h-12 px-7 rounded-[var(--radius-sm)] text-[14px] font-extrabold text-white transition-all hover:-translate-y-0.5"
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(255,180,80,0.08) 0%, rgba(255,80,80,0.03) 100%)",
-                  borderColor: "var(--color-border-strong)",
+                    "linear-gradient(135deg, var(--color-brand), var(--color-cyan))",
+                  boxShadow: "0 0 28px var(--color-brand-glow)",
+                  fontFamily: "var(--font-display)",
+                  letterSpacing: "0.01em",
                 }}
               >
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full pulse-live"
-                    style={{ background: "var(--color-positive)" }}
-                  />
-                  <span
-                    className="text-[9px] font-semibold uppercase tracking-widest"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    Top wins · 24h
-                  </span>
-                </div>
-                <p
-                  className="text-[28px] md:text-[36px] font-extrabold leading-none"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    letterSpacing: "-2px",
-                    color: "var(--color-text-primary)",
-                  }}
-                >
-                  $4 832
-                </p>
-                <p
-                  className="text-[12px] mt-1.5"
-                  style={{ color: "var(--color-text-secondary)" }}
-                >
-                  Drake_Trainer ·{" "}
-                  <span style={{ color: "var(--color-pokemon-yellow)" }}>
-                    Dracaufeu Cristal PSA 10
-                  </span>{" "}
-                  · Caisse Skyridge
-                </p>
-              </div>
-
-              {/* Mini grille caisses */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-4">
-                {[
-                  {
-                    emoji: "🔥",
-                    name: "Kanto",
-                    price: "0,99 $",
-                    color: "#FF6B47",
-                  },
-                  {
-                    emoji: "⚡",
-                    name: "Néo Genesis",
-                    price: "2,49 $",
-                    color: "#FFCC00",
-                  },
-                  {
-                    emoji: "💎",
-                    name: "Cristaux",
-                    price: "14,99 $",
-                    color: "#00D4FF",
-                  },
-                  {
-                    emoji: "👑",
-                    name: "Gold Star",
-                    price: "49,99 $",
-                    color: "#FFD700",
-                  },
-                ].map((c) => (
-                  <div
-                    key={c.name}
-                    className="rounded-[var(--radius-sm)] border p-3"
-                    style={{
-                      background: `linear-gradient(140deg, ${c.color}22, transparent)`,
-                      borderColor: "var(--color-border)",
-                    }}
-                  >
-                    <p className="text-[24px] mb-1">{c.emoji}</p>
-                    <p
-                      className="text-[11px] font-bold truncate"
-                      style={{ color: "var(--color-text-primary)" }}
-                    >
-                      {c.name}
-                    </p>
-                    <p
-                      className="text-[10px] tabular-nums"
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        color: "var(--color-positive)",
-                      }}
-                    >
-                      {c.price}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Feed live */}
-              <div
-                className="rounded-[var(--radius-sm)] border overflow-hidden"
-                style={{ borderColor: "var(--color-border)" }}
+                <Zap size={14} fill="white" strokeWidth={0} />
+                Jouer maintenant
+                <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="#features"
+                className="flex items-center gap-2 h-12 px-5 rounded-[var(--radius-sm)] text-[13px] font-semibold border transition-colors"
+                style={{
+                  background: "var(--color-bg-glass)",
+                  borderColor: "var(--color-border)",
+                  color: "var(--color-text-secondary)",
+                }}
               >
-                {[
-                  {
-                    user: "Sacha_X",
-                    card: "Lugia Neo PSA 9",
-                    value: "$1 240",
-                    up: true,
-                    energy: "colorless",
-                  },
-                  {
-                    user: "OakReborn",
-                    card: "Mewtwo Star PSA 10",
-                    value: "$3 100",
-                    up: true,
-                    energy: "psychic",
-                  },
-                  {
-                    user: "L33TJ4",
-                    card: "Rayquaza VMAX PSA 8",
-                    value: "$420",
-                    up: true,
-                    energy: "dragon",
-                  },
-                ].map((w, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0"
-                    style={{
-                      borderColor: "var(--color-border)",
-                      background:
-                        i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
-                    }}
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full pulse-live"
-                      style={{ background: "var(--color-positive)" }}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-[11px] font-semibold truncate"
-                        style={{ color: "var(--color-text-primary)" }}
-                      >
-                        <span style={{ color: "var(--color-brand-hi)" }}>
-                          {w.user}
-                        </span>{" "}
-                        a ouvert {w.card}
-                      </p>
-                    </div>
-                    <span
-                      className="text-[11px] font-bold"
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        color: "var(--color-positive)",
-                      }}
-                    >
-                      +{w.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                Voir les modes de jeu
+                <ArrowUpRight size={13} />
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+              {[
+                "100% monnaie fictive",
+                "Aucune CB requise",
+                "18+",
+                "Conforme loi française",
+              ].map((t) => (
+                <span
+                  key={t}
+                  className="text-[11px] flex items-center gap-1.5"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  <span
+                    className="w-1 h-1 rounded-full"
+                    style={{ background: "var(--color-text-subtle)" }}
+                  />
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT — jackpot live counter (le drama est ici) */}
+          <div className="relative">
+            <div
+              className="absolute -inset-8 rounded-[24px] pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(ellipse 80% 70% at 50% 50%, rgba(255,215,64,0.18) 0%, transparent 70%)",
+              }}
+            />
+            <div className="relative">
+              <JackpotCounter />
+              <p
+                className="text-center text-[11px] mt-3"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                Le pot communautaire en monnaie fictive. Tirage proportionnel
+                à la valeur déposée.
+              </p>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* ── COMPTEUR SOCIAL ─────────────────────────────────────── */}
       <section

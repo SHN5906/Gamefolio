@@ -16,6 +16,8 @@ import { PACKS } from "@/data/packs";
 import { PackCard } from "@/components/game/PackCard";
 import { DailyBar } from "@/components/game/DailyBar";
 import { CooldownBanner } from "@/components/game/CooldownBanner";
+import { LiveWinsTicker } from "@/components/game/LiveWinsTicker";
+import { JackpotCounter } from "@/components/game/JackpotCounter";
 import { useBalance, useBootstrap, useInventory } from "@/hooks/useGame";
 
 export default function GamePage() {
@@ -41,43 +43,39 @@ export default function GamePage() {
       className="min-h-full page-enter"
       style={{ position: "relative", zIndex: 1 }}
     >
+      {/* Live wins ticker — full-width band sous la topbar */}
+      <LiveWinsTicker />
+
       <div
-        className="px-4 sm:px-6 md:px-8 pt-6 pb-16 mx-auto"
+        className="px-4 sm:px-6 md:px-8 pt-5 pb-16 mx-auto"
         style={{ maxWidth: 1280 }}
       >
         {/* Welcome modal $10 */}
         {showWelcome && <WelcomeBonus onClose={() => setShowWelcome(false)} />}
 
-        {/* Header */}
+        {/* Jackpot live (hero du game home) */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles
-              size={14}
-              style={{ color: "var(--color-pokemon-yellow)" }}
-            />
-            <p
-              className="text-[10px] font-semibold uppercase tracking-[1.4px]"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              Game · Casino TCG Pokémon
-            </p>
-          </div>
+          <JackpotCounter />
+        </div>
+
+        {/* Header compact */}
+        <div className="mb-6">
           <h1
-            className="text-[28px] sm:text-[34px] font-extrabold tracking-tight leading-none"
+            className="text-[24px] sm:text-[30px] font-extrabold tracking-tight leading-none"
             style={{
               fontFamily: "var(--font-display)",
               color: "var(--color-text-primary)",
               letterSpacing: "-0.03em",
             }}
           >
-            Ouvre des caisses, gagne des cartes
+            Ouvre des caisses
           </h1>
           <p
-            className="text-[13px] mt-2"
+            className="text-[12.5px] mt-2"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            15 caisses, des centaines de cartes Pokémon, des jackpots à six
-            chiffres. $10 offerts à l&apos;inscription.
+            15 caisses thématiques · variantes PSA Raw → PSA 10 · drop tables
+            transparentes
           </p>
         </div>
 
