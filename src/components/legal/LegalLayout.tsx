@@ -9,9 +9,9 @@ export function LegalLayout({ title, lastUpdate, children }: { title: string; la
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-[10px] flex items-center justify-center text-white text-[12px] font-extrabold"
               style={{ fontFamily: 'var(--font-display)', background: 'linear-gradient(140deg, var(--color-brand), var(--color-cyan))' }}>
-              CF
+              GF
             </div>
-            <span className="text-[15px] font-extrabold" style={{ fontFamily: 'var(--font-display)' }}>CardFolio</span>
+            <span className="text-[15px] font-extrabold" style={{ fontFamily: 'var(--font-display)' }}>GameFolio</span>
           </Link>
           <Link href="/" className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>← Retour</Link>
         </div>
@@ -32,11 +32,11 @@ export function LegalLayout({ title, lastUpdate, children }: { title: string; la
 
       <footer className="px-6 md:px-10 py-8 border-t" style={{ borderColor: 'var(--color-border)' }}>
         <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
-          <span>© 2026 CardFolio</span>
+          <span>© 2026 GameFolio · 18+</span>
           <div className="flex gap-4">
             <Link href="/privacy" style={{ color: 'var(--color-text-muted)' }}>Confidentialité</Link>
             <Link href="/terms" style={{ color: 'var(--color-text-muted)' }}>CGU</Link>
-            <a href="mailto:hello@cardfolio.app" style={{ color: 'var(--color-text-muted)' }}>Contact</a>
+            <a href="mailto:hello@gamefolio.app" style={{ color: 'var(--color-text-muted)' }}>Contact</a>
           </div>
         </div>
       </footer>

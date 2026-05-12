@@ -1,10 +1,30 @@
-# CardFolio — Web App
+# GameFolio — Web App
 
-## Vision
+> **Pivot (mai 2026)** : ce projet a pivoté du portfolio tracker (CardFolio) vers un
+> casino TCG en monnaie fictive style Hellcase. Les anciennes sections de ce
+> document parlent encore du portfolio — voir `ARCHITECTURE.md` pour la conception
+> du nouveau système (caisses, PSA, regrade, roue, jackpot) et `DEPLOY.md` pour la
+> mise en prod.
 
-CardFolio fait pour les cartes Pokémon TCG ce que Coinbase fait pour la crypto : transformer une collection éparpillée en patrimoine lisible, suivi en temps réel, partageable avec dignité.
-Interface fintech sobre (Revolut/Coinbase), en français, en euros, dans le navigateur.
-Marché cible : France first, EUR par défaut, i18n EN prête dès le départ.
+## Vision (nouvelle)
+
+GameFolio est un casino TCG en **monnaie fictive uniquement** : on ouvre des caisses
+thématiques (Kanto, Neo, Shinings, Cristaux…), on joue à la roue d'upgrade, on
+défie d'autres joueurs en battle PvP, on dépose dans le jackpot communautaire.
+$10 fictifs offerts à l'inscription, aucune CB requise, jamais.
+
+**Aucun argent réel ne peut entrer ni sortir** — seul le tier VIP cosmétique est
+payant (Stripe), mais ne donne aucun avantage de gameplay. C'est ce qui rend
+le produit légal en France (art. 322-2-3 du Code de la sécurité intérieure).
+
+Marché cible : France first (18+, géo-bloqué BE/NL), EUR pour la facturation VIP,
+monnaie de jeu en `$` fictif.
+
+## Vision (legacy CardFolio — pour mémoire)
+
+CardFolio faisait pour les cartes Pokémon TCG ce que Coinbase fait pour la crypto :
+transformer une collection éparpillée en patrimoine lisible, suivi en temps réel,
+partageable avec dignité. Cette vision est désormais abandonnée.
 
 ---
 

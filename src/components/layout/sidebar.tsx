@@ -38,7 +38,7 @@ export function Sidebar() {
     >
       {/* Logo avec halo */}
       <Link
-        href="/dashboard"
+        href="/game"
         className="w-9 h-9 rounded-[10px] flex items-center justify-center mb-4 text-white text-[13px] font-extrabold flex-shrink-0 relative group"
         style={{
           fontFamily: 'var(--font-display)',
@@ -46,9 +46,9 @@ export function Sidebar() {
           boxShadow: '0 0 20px var(--color-brand-glow), inset 0 1px 0 rgba(255,255,255,0.2)',
           letterSpacing: '-0.03em',
         }}
-        title="CardFolio"
+        title="GameFolio"
       >
-        CF
+        GF
         <span
           className="absolute inset-0 rounded-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
           style={{

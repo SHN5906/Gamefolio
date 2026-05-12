@@ -158,7 +158,7 @@ export default function SettingsPage() {
                 Plan actuel
               </p>
               <p className="text-[15px] font-bold capitalize" style={{ fontFamily: 'var(--font-display)' }}>
-                CardFolio {profile?.subscription_tier ?? 'Free'}
+                GameFolio {profile?.subscription_tier ?? 'Free'}
               </p>
               {profile?.subscription_renews_at && (
                 <p className="text-[10.5px] mt-0.5" style={{ fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)' }}>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Profile section */}
-      <Section icon={User} title="Profil public" subtitle="Visible si tu actives le partage de collection">
+      <Section icon={User} title="Profil public" subtitle="Ton pseudo et avatar — visibles dans les battles, jackpot et leaderboard">
         <div className="flex flex-col sm:flex-row gap-5">
           <ImageUpload
             value={avatarUrl}
@@ -183,11 +183,11 @@ export default function SettingsPage() {
             label="Avatar"
           />
           <div className="flex-1 flex flex-col gap-3">
-            <Input label="Nom affiché" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Ton nom" />
-            <Input label="Username (URL publique)" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} placeholder="hugo_m" />
+            <Input label="Nom affiché" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Dresseur Pro" />
+            <Input label="Username (URL publique)" value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))} placeholder="dresseur_pro" />
             {username && (
               <p className="text-[10.5px]" style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                cardfolio.app/u/{username}
+                gamefolio.app/u/{username}
               </p>
             )}
           </div>
@@ -217,10 +217,10 @@ export default function SettingsPage() {
         </div>
       </Section>
 
-      {/* Preferences */}
-      <Section icon={Globe2} title="Préférences" subtitle="Devise et langue par défaut">
+      {/* Préférences (langue uniquement — la monnaie virtuelle est en $ fictif) */}
+      <Section icon={Globe2} title="Langue de l'interface">
         <div className="flex flex-wrap gap-2">
-          {(['EUR', 'USD', 'GBP'] as const).map(c => (
+          {(['EUR', 'USD'] as const).map(c => (
             <button
               key={c}
               type="button"
@@ -233,24 +233,34 @@ export default function SettingsPage() {
                 boxShadow: currency === c ? '0 0 12px var(--color-brand-glow)' : 'none',
               }}
             >
-              {c}
+              {c === 'EUR' ? '🇫🇷 Français' : '🇺🇸 English (bientôt)'}
             </button>
           ))}
         </div>
       </Section>
 
-      {/* Notifications (placeholder) */}
-      <Section icon={Bell} title="Notifications" subtitle="Alertes prix et nouveautés">
-        <ToggleRow label="Alertes wishlist quand le prix baisse" defaultOn />
-        <ToggleRow label="Résumé hebdomadaire de la valeur du portfolio" defaultOn />
-        <ToggleRow label="Nouveautés CardFolio" />
+      {/* Notifications */}
+      <Section icon={Bell} title="Notifications" subtitle="Reste informé sans spam">
+        <ToggleRow label="Email quand un battle PvP que j'attends démarre" defaultOn />
+        <ToggleRow label="Email quand le jackpot communautaire dépasse $1 000" />
+        <ToggleRow label="Newsletter — nouvelles caisses & événements (1× / semaine max)" />
       </Section>
 
-      {/* Privacy */}
-      <Section icon={Eye} title="Confidentialité" subtitle="Contrôle ce que les autres peuvent voir">
-        <ToggleRow label="Profil public (cardfolio.app/u/…)" />
-        <ToggleRow label="Afficher la valeur totale du portfolio" />
-        <ToggleRow label="Afficher les prix d'achat (P&L)" />
+      {/* Confidentialité */}
+      <Section icon={Eye} title="Confidentialité">
+        <ToggleRow label="Profil public visible (battles, jackpot, leaderboard)" defaultOn />
+        <ToggleRow label="Afficher ma valeur d'inventaire totale sur mon profil" />
+        <ToggleRow label="Afficher mon historique d'ouvertures sur mon profil" />
+      </Section>
+
+      {/* Jeu responsable */}
+      <Section icon={AlertCircle} title="Jeu responsable" subtitle="GameFolio est en monnaie fictive — mais si tu sens que tu joues trop, on est là">
+        <ToggleRow label="Limiter mes ouvertures à 100/jour" />
+        <ToggleRow label="Auto-exclusion 24h" />
+        <ToggleRow label="Auto-exclusion 7 jours" />
+        <p className="text-[11px] mt-3" style={{ color: 'var(--color-text-muted)' }}>
+          Aide : <a href="https://www.joueurs-info-service.fr/" target="_blank" rel="noreferrer" style={{ color: 'var(--color-brand)' }}>Joueurs Info Service — 09 74 75 13 13</a> (gratuit, 8h–2h)
+        </p>
       </Section>
 
       {/* Danger zone */}

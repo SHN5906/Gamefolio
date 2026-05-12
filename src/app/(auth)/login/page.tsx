@@ -45,7 +45,7 @@ function LoginForm() {
 
     // Si Supabase n'est pas configuré, on redirige directement (mode démo)
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      router.push('/dashboard')
+      router.push('/game')
       return
     }
 
@@ -61,7 +61,7 @@ function LoginForm() {
       return
     }
 
-    router.push('/dashboard')
+    router.push('/game')
     router.refresh()
   }
 
@@ -138,14 +138,14 @@ export default function LoginPage() {
             boxShadow: '0 0 28px var(--color-brand-glow)',
           }}
         >
-          CF
+          GF
         </div>
         <div>
           <p className="text-[18px] font-bold tracking-tight leading-none" style={{ fontFamily: 'var(--font-display)' }}>
-            CardFolio
+            GameFolio
           </p>
           <p className="text-[11px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-            Ta collection, en portefeuille.
+            Le casino TCG en monnaie fictive.
           </p>
         </div>
       </div>
@@ -179,7 +179,7 @@ export default function LoginPage() {
           Connexion
         </h1>
         <p className="text-[13px] mb-5" style={{ color: 'var(--color-text-muted)' }}>
-          Accède à ton portefeuille
+          Accède à ton compte
         </p>
 
         {/* Wrappé dans Suspense — requis par Next.js App Router */}
@@ -196,7 +196,7 @@ export default function LoginPage() {
 
         {/* Démo (sans compte) */}
         <Link
-          href="/dashboard"
+          href="/game"
           className="flex w-full items-center justify-center gap-2 h-9 rounded-[var(--radius-sm)] border text-[13px] font-medium transition-all duration-150 hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-primary)]"
           style={{
             borderColor: 'var(--color-border)',

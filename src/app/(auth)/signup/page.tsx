@@ -24,10 +24,10 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const FEATURES = [
-  'Valorisation Cardmarket en temps réel',
-  'Courbes de prix historiques',
-  'P&L par carte et par set',
-  '50 cartes gratuites sans CB',
+  '$10 fictifs offerts à l\'inscription',
+  '15 caisses thématiques (Kanto, Neo, Shinings, Cristaux…)',
+  'Battles PvP, jackpot, roue d\'upgrade, regrade',
+  '100% monnaie fictive · Aucune CB requise',
 ]
 
 export default function SignupPage() {
@@ -45,7 +45,7 @@ export default function SignupPage() {
 
     // Mode démo sans Supabase
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      router.push('/dashboard')
+      router.push('/game')
       return
     }
 
@@ -80,10 +80,10 @@ export default function SignupPage() {
               boxShadow: '0 0 24px var(--color-brand-glow)',
             }}
           >
-            CF
+            GF
           </div>
           <span className="text-[17px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
-            CardFolio
+            GameFolio
           </span>
         </div>
 
@@ -91,10 +91,10 @@ export default function SignupPage() {
           className="text-[28px] font-bold leading-tight tracking-tight mb-3"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          Ta collection mérite mieux qu&apos;un Notion.
+          Ouvre ta première caisse en 30 secondes.
         </h2>
         <p className="text-[13px] mb-7" style={{ color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-          Rejoins les collectionneurs qui suivent leurs cartes comme un portefeuille financier.
+          Le casino TCG en monnaie fictive. Aucun argent réel, aucune CB. Que du fun.
         </p>
 
         {/* Features */}
@@ -143,7 +143,7 @@ export default function SignupPage() {
             Créer un compte
           </h1>
           <p className="text-[13px] mb-5" style={{ color: 'var(--color-text-muted)' }}>
-            Gratuit · 50 cartes · Sans CB
+            $10 fictifs offerts · 18+ · Sans CB
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3.5">

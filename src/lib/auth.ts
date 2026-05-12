@@ -14,7 +14,7 @@ export async function loginAction(formData: FormData) {
     return { error: 'Email ou mot de passe incorrect.' }
   }
 
-  redirect('/dashboard')
+  redirect('/game')
 }
 
 export async function signupAction(formData: FormData) {
