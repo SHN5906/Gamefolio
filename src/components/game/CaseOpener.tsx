@@ -92,7 +92,19 @@ function energyGradient(e: string) {
 
 export function CaseOpener({ pack, onComplete, triggerKey }: CaseOpenerProps) {
   const [phase, setPhase] = useState<"idle" | "spinning" | "revealed">("idle");
-  const [rail, setRail] = useState<GameCard[]>([]);
+  // Aperçu au repos : on remplit le rail avec un échantillon aléatoire du
+  // pool dès le mount → la zone n'est plus vide avant le premier spin.
+  // Lazy initializer (autorisé par react-hooks/purity pour useState init,
+  // contrairement à useMemo).
+  const [rail, setRail] = useState<GameCard[]>(() => {
+    const preview: GameCard[] = [];
+    for (let i = 0; i < RAIL_LENGTH; i++) {
+      preview.push(
+        pack.cardPool[Math.floor(Math.random() * pack.cardPool.length)],
+      );
+    }
+    return preview;
+  });
   const [winner, setWinner] = useState<{
     card: GameCard;
     grade: Grade;
@@ -228,16 +240,9 @@ export function CaseOpener({ pack, onComplete, triggerKey }: CaseOpenerProps) {
           ))}
         </motion.div>
 
-        {phase === "idle" && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p
-              className="text-[14px] font-medium"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              En attente d&apos;ouverture…
-            </p>
-          </div>
-        )}
+        {/* L'overlay "En attente d'ouverture…" est retiré : le rail rempli
+            d'un aperçu de cartes signale visuellement le contenu du pack
+            sans nécessiter de texte. Pattern Hellcase. */}
       </div>
 
       {/* RÉSULTAT */}
