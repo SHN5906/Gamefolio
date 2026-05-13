@@ -1,54 +1,17 @@
 'use client'
 
-import { Clock, RefreshCw, Sparkles } from 'lucide-react'
+import { RefreshCw, Sparkles } from 'lucide-react'
 import { useCooldown, useBalance } from '@/hooks/useGame'
 
 export function CooldownBanner() {
-  const { active, label, canClaim, refreshAmount, claim } = useCooldown()
+  const { canClaim, refreshAmount, claim } = useCooldown()
   const { balance } = useBalance()
 
-  // Bannière visible uniquement si solde = 0 ou cooldown actif
-  if (balance > 0 && !active && !canClaim) return null
-
-  if (active) {
-    return (
-      <div
-        className="rounded-[var(--radius-md)] border p-4 mb-5 flex items-center gap-4"
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(255,77,94,0.08), rgba(245,166,35,0.05))',
-          borderColor: 'rgba(255,77,94,0.25)',
-        }}
-      >
-        <div
-          className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{
-            background: 'rgba(255,77,94,0.15)',
-            border: '1px solid rgba(255,77,94,0.3)',
-          }}
-        >
-          <Clock size={18} style={{ color: 'var(--color-negative)' }} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p
-            className="text-[10px] font-semibold uppercase tracking-[1.2px]"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            Plus de solde — pause forcée
-          </p>
-          <p
-            className="text-[14px] font-bold mt-0.5"
-            style={{
-              fontFamily: 'var(--font-display)',
-              color: 'var(--color-text-primary)',
-            }}
-          >
-            Reviens dans <span style={{ fontFamily: 'var(--font-mono)' }}>{label}</span> pour <span style={{ color: 'var(--color-positive)' }}>+${refreshAmount.toFixed(2)}</span>
-          </p>
-        </div>
-      </div>
-    )
-  }
+  // Bannière visible uniquement si un bonus est claimable.
+  // Note dev : la branche "Plus de solde — pause forcée" (cooldown actif)
+  // est retirée pour ne pas bloquer la démo. À réactiver en prod pour le
+  // jeu responsable — voir DEPLOY.md Phase 2.
+  if (balance > 0 && !canClaim) return null
 
   if (canClaim) {
     return (
