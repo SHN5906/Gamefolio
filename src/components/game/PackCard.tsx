@@ -241,7 +241,7 @@ const ENERGY_GRADIENT: Record<string, string> = {
   dragon: "linear-gradient(155deg, #312E81, #6366F1 45%, #6B5BA8)",
 };
 
-function ShowcaseCard({
+export function ShowcaseCard({
   card,
   rotate,
   translateX,

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, RotateCw, Archive, AlertCircle } from "lucide-react";
 import { CaseOpener } from "@/components/game/CaseOpener";
 import { CooldownBanner } from "@/components/game/CooldownBanner";
+import { ShowcaseCard } from "@/components/game/PackCard";
 import { getPackById } from "@/data/packs";
 import { useBalance, useOpenPack } from "@/hooks/useGame";
 import { useTCGdexCard, tcgdexImageUrl } from "@/hooks/useTCGdexCard";
@@ -117,12 +118,60 @@ export default function OpenPackPage({ params }: PageProps) {
                 "radial-gradient(circle at 25% 25%, rgba(255,255,255,0.4) 0, transparent 50%)",
             }}
           />
-          <div className="relative flex items-center gap-5 z-10">
+          <div className="relative flex items-center gap-5 sm:gap-7 z-10">
+            {/* Showcase fan — top 3 cartes les plus chères du pool */}
             <div
-              className="text-[64px] sm:text-[80px] flex-shrink-0"
-              style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))" }}
+              className="relative flex-shrink-0"
+              style={{
+                width: "clamp(140px, 22vw, 200px)",
+                aspectRatio: "5/7",
+                filter: "drop-shadow(0 12px 32px rgba(0,0,0,0.55))",
+              }}
             >
-              {pack.emoji}
+              {(() => {
+                const showcase = [...pack.cardPool]
+                  .sort((a, b) => b.value - a.value)
+                  .slice(0, 3);
+                return (
+                  <>
+                    {showcase[1] && (
+                      <ShowcaseCard
+                        card={showcase[1]}
+                        rotate={-14}
+                        translateX={-32}
+                        translateY={6}
+                        z={1}
+                      />
+                    )}
+                    {showcase[2] && (
+                      <ShowcaseCard
+                        card={showcase[2]}
+                        rotate={14}
+                        translateX={32}
+                        translateY={6}
+                        z={2}
+                      />
+                    )}
+                    {showcase[0] && (
+                      <ShowcaseCard
+                        card={showcase[0]}
+                        rotate={0}
+                        translateX={0}
+                        translateY={-4}
+                        z={3}
+                        hero
+                      />
+                    )}
+                  </>
+                );
+              })()}
+              {/* Emoji sticker bas-droite, reprend le pattern PackCard */}
+              <div
+                className="absolute -bottom-1 -right-1 text-[28px] pointer-events-none z-10"
+                style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.5))" }}
+              >
+                {pack.emoji}
+              </div>
             </div>
             <div className="flex-1 min-w-0">
               <h1
