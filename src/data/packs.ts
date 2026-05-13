@@ -683,7 +683,7 @@ const CARDS = {
     animTier: "legendary" as const,
   },
   goldStarUmbreon: {
-    id: "cel25-17A",
+    id: "pop5-17",
     name: "Umbreon Star",
     nameFr: "Noctali Star",
     set: "Celebrations",
@@ -1153,7 +1153,10 @@ const CARDS = {
     animTier: "rare" as const,
   },
   mewtwoVMAX: {
-    id: "swsh9-31",
+    // TCGdex ne catalogue pas Mewtwo VMAX (n'existe pas en officiel — Mewtwo
+    // n'a que V et VSTAR). On utilise l'art Mewtwo VSTAR de Pokémon GO TCG,
+    // le nameFr "Mewtwo VMAX" reste affiché côté UI.
+    id: "swsh10.5-031",
     name: "Mewtwo V-Union",
     nameFr: "Mewtwo Union Élite",
     set: "Brilliant Stars",
@@ -1430,7 +1433,7 @@ const CARDS = {
 
   // ═══════════ ÉNERGIES BASIQUES — quasi-zéro valeur ═══════════
   fireEnergy: {
-    id: "swsh1-235",
+    id: "g1-76",
     name: "Fire Energy",
     nameFr: "Énergie Feu",
     set: "Sword & Shield",
@@ -1443,7 +1446,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   waterEnergy: {
-    id: "swsh1-236",
+    id: "g1-77",
     name: "Water Energy",
     nameFr: "Énergie Eau",
     set: "Sword & Shield",
@@ -1456,7 +1459,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   grassEnergy: {
-    id: "swsh1-234",
+    id: "g1-75",
     name: "Grass Energy",
     nameFr: "Énergie Plante",
     set: "Sword & Shield",
@@ -1469,7 +1472,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   lightningEnergy: {
-    id: "swsh1-237",
+    id: "g1-78",
     name: "Lightning Energy",
     nameFr: "Énergie Électrik",
     set: "Sword & Shield",
@@ -1482,7 +1485,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   psychicEnergy: {
-    id: "swsh1-238",
+    id: "g1-79",
     name: "Psychic Energy",
     nameFr: "Énergie Psy",
     set: "Sword & Shield",
@@ -1495,7 +1498,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   fightingEnergy: {
-    id: "swsh1-239",
+    id: "g1-80",
     name: "Fighting Energy",
     nameFr: "Énergie Combat",
     set: "Sword & Shield",
@@ -1508,7 +1511,7 @@ const CARDS = {
     animTier: "base" as const,
   },
   darknessEnergy: {
-    id: "swsh1-240",
+    id: "hgss3-79",
     name: "Darkness Energy",
     nameFr: "Énergie Obscure",
     set: "Sword & Shield",
