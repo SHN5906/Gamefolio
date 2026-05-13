@@ -1028,9 +1028,12 @@ function ReelCell({
   isTarget: boolean;
   settled: boolean;
 }) {
-  // Seule la cellule cible fetch TCGdex — fillers en gradient énergie.
-  const { data: tcg } = useTCGdexCard(isTarget ? card.id : null);
-  const imageUrl = isTarget ? tcgdexImageUrl(tcg, "high") : null;
+  // Toutes les cellules fetch TCGdex — React Query dédupe par cardId et
+  // partage le cache 24h, donc le coût total = 1 fetch par cardId unique
+  // (les fillers se répètent dans un pool restreint). Qualité 'low' sur
+  // les fillers : ils défilent vite, l'œil ne lit pas la haute résolution.
+  const { data: tcg } = useTCGdexCard(card.id);
+  const imageUrl = tcgdexImageUrl(tcg, isTarget ? "high" : "low");
   const energyBg = ENERGY_BG[card.energy.toLowerCase()] ?? ENERGY_BG.colorless;
 
   return (
@@ -1045,7 +1048,7 @@ function ReelCell({
           fill
           className="object-contain"
           style={{
-            transform: settled ? "scale(1)" : "scale(0.95)",
+            transform: settled && isTarget ? "scale(1)" : "scale(0.96)",
             transition: "transform 0.4s ease-out",
           }}
           unoptimized
