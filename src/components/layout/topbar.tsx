@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { BalancePill } from "@/components/game/BalancePill";
 import { DailyBar } from "@/components/game/DailyBar";
 import { PlayerCounter } from "@/components/game/PlayerCounter";
@@ -15,7 +16,13 @@ interface TopbarProps {
 
 export function Topbar({ title, subtitle }: TopbarProps) {
   const { profile } = useProfile();
-  const displayName = profile.username || "Dresseur";
+  // Profil lu depuis localStorage — gate via `mounted` pour éviter
+  // mismatch SSR/CSR sur le username.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const displayName = mounted ? profile.username || "Dresseur" : "Dresseur";
 
   return (
     <div

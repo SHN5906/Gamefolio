@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Gamepad2,
   Swords,
@@ -29,9 +30,15 @@ const FOOTER_NAV = [{ href: "/game/profile", icon: User, label: "Profil" }];
 export function Sidebar() {
   const pathname = usePathname();
   const { profile } = useProfile();
-  const displayName = profile.username || "Dresseur";
+  // Profil chargé depuis localStorage → diverge du SSR. On gate l'affichage
+  // dynamique derrière `mounted` pour éviter le mismatch d'hydratation.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const displayName = mounted ? profile.username || "Dresseur" : "Dresseur";
   const initial = displayName.charAt(0).toUpperCase();
-  const avatarColor = profile.avatarColor || "#2A7DFF";
+  const avatarColor = mounted ? profile.avatarColor || "#2A7DFF" : "#2A7DFF";
 
   return (
     <aside
