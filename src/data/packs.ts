@@ -1193,8 +1193,12 @@ const CARDS = {
   },
 
   // ULTRA RARE — Pikachu Illustrator
+  // L'illustrator originale n'existe pas dans TCGdex. On utilise l'art
+  // du Wizards Promo Pikachu (basep-1, illustrator Keiji Kinebuchi) qui
+  // partage l'esthétique "promo collector". Le nameFr reste "Pikachu
+  // Illustrateur" — l'art sert d'icône, la valeur reste mythique.
   pikachuIllustrator: {
-    id: "illustrator-1",
+    id: "basep-1",
     name: "Pikachu Illustrator",
     nameFr: "Pikachu Illustrateur",
     set: "CoroCoro Comic",
@@ -1208,8 +1212,10 @@ const CARDS = {
   },
 
   // 1ère Édition Charizard
+  // Le stamp "1st Edition" est juste une variante d'impression du même
+  // base1-4 — TCGdex ne distingue pas, donc on réutilise l'art Base Set.
   charizardBase1stEd: {
-    id: "base1-4-1ed",
+    id: "base1-4",
     name: "Charizard 1st Ed.",
     nameFr: "Dracaufeu 1ère Édition",
     set: "Base Set",

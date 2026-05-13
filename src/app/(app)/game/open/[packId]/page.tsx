@@ -325,8 +325,8 @@ function DropTable({ pack }: { pack: ReturnType<typeof getPackById> }) {
 
 function DropCard({ card }: { card: GameCard }) {
   const { data: tcgCard } = useTCGdexCard(card.id);
-  const displayName = tcgCard?.name ?? card.nameFr;
-  const setName = tcgCard?.set?.name ?? card.setFr;
+  const displayName = card.nameFr || tcgCard?.name || card.name;
+  const setName = card.setFr || tcgCard?.set?.name || card.set;
   const imageUrl = tcgdexImageUrl(tcgCard, "low") ?? card.imageUrl;
   const accent = TIER_ACCENT[card.animTier];
 

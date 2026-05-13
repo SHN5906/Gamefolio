@@ -360,7 +360,7 @@ function CardFallback({
 function RailCard({ card }: { card: GameCard }) {
   const { data: tcgCard, isLoading } = useTCGdexCard(card.id);
   const imageUrl = tcgdexImageUrl(tcgCard, "high") ?? card.imageUrl;
-  const displayName = tcgCard?.name ?? card.nameFr;
+  const displayName = card.nameFr || tcgCard?.name || card.name;
 
   return (
     <div

@@ -314,8 +314,8 @@ function InventoryCard({
 }) {
   const { data: tcgCard } = useTCGdexCard(card.id)
   const imageUrl = tcgdexImageUrl(tcgCard, 'high') ?? card.imageUrl
-  const displayName = tcgCard?.name ?? card.nameFr
-  const setName = tcgCard?.set?.name ?? card.setFr
+  const displayName = card.nameFr || tcgCard?.name || card.name
+  const setName = card.setFr || tcgCard?.set?.name || card.set
   const [confirming, setConfirming] = useState(false)
 
   const handleSellClick = (e: React.MouseEvent) => {

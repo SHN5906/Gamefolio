@@ -86,15 +86,19 @@ interface EnrichedCard {
 
 /**
  * Hook DRY qui combine card statique + données TCGdex.
- * Source unique de vérité : si TCGdex répond, on utilise ses données.
- * Sinon, fallback sur les données statiques (qui peuvent être null/incomplètes).
+ * - Image : TCGdex (source de vérité visuelle)
+ * - Nom / set : on PRÉFÈRE les valeurs curées du pack (nameFr, setFr) à
+ *   celles de TCGdex. Raison : certaines cartes "fantasy" du jeu pointent
+ *   sur un art TCGdex équivalent mais conservent un nom identitaire propre
+ *   (ex: "Pikachu Illustrateur" sur basep-1, "Dracaufeu 1ère Édition" sur
+ *   base1-4). TCGdex sert d'illustration, pas d'autorité nominative.
  */
 export function useEnrichedCard(card: GameCard, quality: 'low' | 'high' = 'high'): EnrichedCard {
   const { data: tcgCard, isLoading } = useTCGdexCard(card.id)
   return {
     imageUrl: tcgdexImageUrl(tcgCard, quality) ?? card.imageUrl,
-    displayName: tcgCard?.name ?? card.nameFr,
-    setName: tcgCard?.set?.name ?? card.setFr,
+    displayName: card.nameFr || tcgCard?.name || card.name,
+    setName: card.setFr || tcgCard?.set?.name || card.set,
     localId: tcgCard?.localId ?? card.number,
     isLoading,
   }
