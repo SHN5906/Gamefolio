@@ -3,11 +3,11 @@
 import { useCallback, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, RotateCw, Archive, AlertCircle, Clock } from "lucide-react";
+import { ArrowLeft, RotateCw, Archive, AlertCircle } from "lucide-react";
 import { CaseOpener } from "@/components/game/CaseOpener";
 import { CooldownBanner } from "@/components/game/CooldownBanner";
 import { getPackById } from "@/data/packs";
-import { useBalance, useOpenPack, useCooldown } from "@/hooks/useGame";
+import { useBalance, useOpenPack } from "@/hooks/useGame";
 import { useTCGdexCard, tcgdexImageUrl } from "@/hooks/useTCGdexCard";
 import type { GameCard, Grade } from "@/types/game";
 
@@ -22,7 +22,6 @@ export default function OpenPackPage({ params }: PageProps) {
 
   const { balance } = useBalance();
   const openPack = useOpenPack();
-  const cooldown = useCooldown();
 
   const [triggerKey, setTriggerKey] = useState(0);
   const [opening, setOpening] = useState(false);
@@ -60,7 +59,9 @@ export default function OpenPackPage({ params }: PageProps) {
   }
 
   const cost = pack.price;
-  const canAfford = balance >= pack.price && !cooldown.active;
+  // Note dev : on retire le gate `!cooldown.active` pour ne pas bloquer la
+  // démo. À réactiver en prod (jeu responsable — pause forcée si solde=0).
+  const canAfford = balance >= pack.price;
 
   const handleOpen = () => {
     if (!canAfford || opening) return;
@@ -257,11 +258,6 @@ export default function OpenPackPage({ params }: PageProps) {
                 <>
                   <RotateCw size={14} className="animate-spin" />
                   Ouverture…
-                </>
-              ) : cooldown.active ? (
-                <>
-                  <Clock size={14} />
-                  Pause · {cooldown.label}
                 </>
               ) : !canAfford ? (
                 "Solde insuffisant"
