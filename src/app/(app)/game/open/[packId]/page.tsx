@@ -283,6 +283,15 @@ export default function OpenPackPage({ params }: PageProps) {
 
 // ── Drop Table ──────────────────────────────────────────────────────────
 
+// Couleur d'accent par tier d'animation — référence Hellcase (orange =
+// covert, rose = classified, violet = restricted, bleu = mil-spec).
+const TIER_ACCENT: Record<GameCard["animTier"], string> = {
+  legendary: "#FF6B47",
+  epic: "#EC4899",
+  rare: "#A855F7",
+  base: "#3B82F6",
+};
+
 function DropTable({ pack }: { pack: ReturnType<typeof getPackById> }) {
   const [open, setOpen] = useState(false);
   if (!pack) return null;
@@ -296,70 +305,74 @@ function DropTable({ pack }: { pack: ReturnType<typeof getPackById> }) {
         className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[1.2px] mb-3"
         style={{ color: "var(--color-text-muted)" }}
       >
-        <span style={{ color: "var(--color-text-primary)" }}>Drop table</span>
+        <span style={{ color: "var(--color-text-primary)" }}>
+          📦 La caisse contient
+        </span>
         <span className="text-[10px]">({pack.cardPool.length} cartes)</span>
         <span>{open ? "▲" : "▼"}</span>
       </button>
 
       {open && (
-        <div
-          className="rounded-[var(--radius-md)] border overflow-hidden"
-          style={{
-            background: "var(--color-bg-glass)",
-            borderColor: "var(--color-border)",
-          }}
-        >
-          <div
-            className="grid grid-cols-[32px_44px_1fr_120px_80px_60px] gap-3 px-3 py-2 border-b text-[10px] font-semibold uppercase tracking-[1px]"
-            style={{
-              borderColor: "var(--color-border)",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            <span>#</span>
-            <span></span>
-            <span>Carte</span>
-            <span>Set</span>
-            <span className="text-right">Valeur</span>
-            <span className="text-right">Drop</span>
-          </div>
-          <div className="max-h-[400px] overflow-y-auto">
-            {sorted.map((c, i) => (
-              <DropTableRow key={c.id + i} card={c} index={i} />
-            ))}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2.5">
+          {sorted.map((c, i) => (
+            <DropCard key={c.id + i} card={c} />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-function DropTableRow({ card, index }: { card: GameCard; index: number }) {
+function DropCard({ card }: { card: GameCard }) {
   const { data: tcgCard } = useTCGdexCard(card.id);
   const displayName = tcgCard?.name ?? card.nameFr;
   const setName = tcgCard?.set?.name ?? card.setFr;
   const imageUrl = tcgdexImageUrl(tcgCard, "low") ?? card.imageUrl;
+  const accent = TIER_ACCENT[card.animTier];
 
   return (
     <div
-      className="grid grid-cols-[32px_44px_1fr_120px_80px_60px] gap-3 px-3 py-2 text-[11.5px] border-b last:border-b-0 items-center"
-      style={{ borderColor: "var(--color-border)" }}
+      className="relative flex flex-col overflow-hidden rounded-[var(--radius-sm)] border transition-transform hover:scale-[1.02] hover:z-10"
+      style={{
+        background: "rgba(15,18,30,0.6)",
+        borderColor: "rgba(255,255,255,0.06)",
+        borderTop: `2px solid ${accent}`,
+        boxShadow: `inset 0 1px 0 ${accent}40`,
+      }}
+      title={`${displayName} — ${setName} — ${card.dropRate.toFixed(2)}%`}
     >
-      <span
-        className="tabular-nums"
-        style={{
-          color: "var(--color-text-muted)",
-          fontFamily: "var(--font-mono)",
-        }}
-      >
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      {/* Card thumbnail */}
+      {/* Top bar : gains % + info icon — pattern Hellcase */}
+      <div className="flex items-center justify-between px-2 pt-1.5 pb-1">
+        <span
+          className="text-[10px] font-medium tabular-nums"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-text-muted)",
+          }}
+        >
+          <span style={{ color: "var(--color-text-secondary)" }}>Gains</span>{" "}
+          <span style={{ color: "var(--color-text-primary)" }}>
+            {card.dropRate.toFixed(3)}%
+          </span>
+        </span>
+        <span
+          className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold flex-shrink-0"
+          style={{
+            background: "rgba(255,255,255,0.08)",
+            color: "var(--color-text-muted)",
+          }}
+          aria-hidden="true"
+        >
+          i
+        </span>
+      </div>
+
+      {/* Card art — image TCGdex centrée sur fond watermark énergie */}
       <div
-        className="w-10 h-14 rounded-[4px] overflow-hidden flex-shrink-0 border"
+        className="relative flex items-center justify-center px-3 pb-2 pt-1"
         style={{
-          background: "var(--color-bg-glass)",
-          borderColor: "var(--color-border-strong)",
+          background: `radial-gradient(ellipse at center, ${accent}18, transparent 70%)`,
+          aspectRatio: "1 / 1",
         }}
       >
         {imageUrl ? (
@@ -367,45 +380,46 @@ function DropTableRow({ card, index }: { card: GameCard; index: number }) {
           <img
             src={imageUrl}
             alt={displayName}
-            className="w-full h-full object-cover"
+            className="max-h-full max-w-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
             loading="lazy"
           />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center text-[7px] text-center p-1"
-            style={{ color: "var(--color-text-muted)" }}
+            className="w-full h-full flex items-center justify-center text-[10px] text-center p-2 rounded-[3px]"
+            style={{
+              color: "var(--color-text-muted)",
+              background: `linear-gradient(135deg, ${accent}30, transparent)`,
+            }}
           >
-            {displayName.slice(0, 8)}
+            {displayName}
           </div>
         )}
       </div>
-      <span style={{ color: "var(--color-text-primary)" }} className="truncate">
-        {displayName}
-      </span>
-      <span
-        className="truncate"
-        style={{ color: "var(--color-text-secondary)" }}
-      >
-        {setName}
-      </span>
-      <span
-        className="text-right tabular-nums"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-positive)",
-        }}
-      >
-        ${card.value.toFixed(2)}
-      </span>
-      <span
-        className="text-right tabular-nums"
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--color-text-muted)",
-        }}
-      >
-        {card.dropRate.toFixed(2)}%
-      </span>
+
+      {/* Bottom : set name (small) + card name (bigger) — pattern Hellcase */}
+      <div className="px-2.5 pb-2 pt-1">
+        <p
+          className="text-[10px] font-medium truncate"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          {setName}
+        </p>
+        <p
+          className="text-[12px] font-bold truncate"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          {displayName}
+        </p>
+        <p
+          className="text-[10.5px] font-extrabold tabular-nums mt-0.5"
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-positive)",
+          }}
+        >
+          ${card.value.toFixed(2)}
+        </p>
+      </div>
     </div>
   );
 }
