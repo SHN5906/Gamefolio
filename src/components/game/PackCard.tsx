@@ -116,23 +116,25 @@ export function PackCard({ pack, affordable }: PackCardProps) {
           )}
         </div>
 
-        {/* Lock overlay */}
+        {/* Lock overlay — opacity réduite (0.6→0.3, sans blur) pour que
+            les cartes du showcase restent visibles. L'icône cadenas suffit
+            à signaler que la caisse est verrouillée. */}
         {locked && (
           <div
             className="absolute inset-0 flex items-center justify-center z-20"
             style={{
-              background: 'rgba(0,0,0,0.6)',
-              backdropFilter: 'blur(2px)',
+              background: 'rgba(0,0,0,0.32)',
             }}
           >
             <div
               className="w-14 h-14 rounded-full flex items-center justify-center border"
               style={{
-                background: 'rgba(0,0,0,0.65)',
-                borderColor: 'rgba(255,255,255,0.15)',
+                background: 'rgba(0,0,0,0.72)',
+                borderColor: 'rgba(255,255,255,0.18)',
+                boxShadow: '0 4px 18px rgba(0,0,0,0.4)',
               }}
             >
-              <Lock size={20} style={{ color: 'rgba(255,255,255,0.85)' }} />
+              <Lock size={20} style={{ color: 'rgba(255,255,255,0.92)' }} />
             </div>
           </div>
         )}
@@ -194,11 +196,33 @@ interface ShowcaseCardProps {
   hero?: boolean
 }
 
+// Gradient riche par énergie — utilisé quand TCGdex ne renvoie pas
+// l'image (cartes EX/Gold Star/Crystal obscures). Mieux qu'un rectangle
+// noir transparent qui faisait croire que rien ne chargeait.
+const ENERGY_GRADIENT: Record<string, string> = {
+  fire:      'linear-gradient(155deg, #7C2D12, #C2410C 45%, #FCD34D)',
+  water:     'linear-gradient(155deg, #0C4A6E, #0369A1 45%, #7DD3FC)',
+  grass:     'linear-gradient(155deg, #14532D, #15803D 45%, #86EFAC)',
+  lightning: 'linear-gradient(155deg, #713F12, #CA8A04 45%, #FEF08A)',
+  psychic:   'linear-gradient(155deg, #1E1B4B, #4338CA 45%, #C084FC)',
+  fighting:  'linear-gradient(155deg, #431407, #9A3412 45%, #FCA5A5)',
+  dark:      'linear-gradient(155deg, #0F172A, #1E293B 45%, #7C3AED)',
+  colorless: 'linear-gradient(155deg, #374151, #6B7280 45%, #D1D5DB)',
+  metal:     'linear-gradient(155deg, #1F2937, #4B5563 45%, #94A3B8)',
+  fairy:     'linear-gradient(155deg, #831843, #DB2777 45%, #F8A5C2)',
+  dragon:    'linear-gradient(155deg, #312E81, #6366F1 45%, #6B5BA8)',
+}
+
 function ShowcaseCard({ card, rotate, translateX, translateY, z, hero }: ShowcaseCardProps) {
-  // Image et nom depuis TCGdex (source unique de vérité)
+  // Image et nom depuis TCGdex (source unique de vérité). Pour les cartes
+  // rares absentes de l'API (EX/Gold Star/Crystal), on retombe sur un
+  // gradient typé énergie + nom — visuellement riche, pas un placeholder
+  // gris qui fait croire que la pack est cassé.
   const { data: tcgCard } = useTCGdexCard(card.id)
   const imageUrl = tcgdexImageUrl(tcgCard, 'low') ?? card.imageUrl
   const displayName = tcgCard?.name ?? card.nameFr
+  const energy = card.energy.toLowerCase()
+  const fallbackBg = ENERGY_GRADIENT[energy] ?? ENERGY_GRADIENT.colorless
 
   return (
     <div
@@ -225,14 +249,33 @@ function ShowcaseCard({ card, rotate, translateX, translateY, z, hero }: Showcas
         />
       ) : (
         <div
-          className="w-full h-full rounded-[6px] flex items-center justify-center text-[10px] font-semibold p-2 text-center"
+          className="relative w-full h-full rounded-[6px] overflow-hidden flex items-end p-2"
           style={{
-            background: 'rgba(0,0,0,0.45)',
-            border: '1px solid rgba(255,255,255,0.18)',
-            color: 'rgba(255,255,255,0.7)',
+            background: fallbackBg,
+            border: '1px solid rgba(255,255,255,0.28)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
           }}
         >
-          {displayName}
+          {/* Sheen subtle pour donner l'impression d'un foil */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%)',
+              mixBlendMode: 'overlay',
+            }}
+          />
+          <span
+            className="relative text-[10px] font-bold leading-tight"
+            style={{
+              fontFamily: 'var(--font-display)',
+              color: 'rgba(255,255,255,0.95)',
+              textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+              wordBreak: 'break-word',
+            }}
+          >
+            {displayName}
+          </span>
         </div>
       )}
     </div>
