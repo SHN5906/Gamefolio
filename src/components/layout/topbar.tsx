@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BalancePill } from "@/components/game/BalancePill";
 import { DailyBar } from "@/components/game/DailyBar";
+import { PlayerCounter } from "@/components/game/PlayerCounter";
 import { useProfile } from "@/hooks/useGame";
 import { FREE_DAILY_LIMIT } from "@/data/packs";
 import { LogoMark } from "@/components/ui/Logo";
@@ -59,6 +60,8 @@ export function Topbar({ title, subtitle }: TopbarProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-2">
+        <PlayerCounter />
+
         {/* DailyBar masquée tant qu'il n'y a pas d'ouvertures gratuites */}
         {FREE_DAILY_LIMIT > 0 && (
           <div className="hidden sm:block">

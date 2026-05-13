@@ -16,7 +16,6 @@ import { PACKS } from "@/data/packs";
 import { PackCard } from "@/components/game/PackCard";
 import { DailyBar } from "@/components/game/DailyBar";
 import { CooldownBanner } from "@/components/game/CooldownBanner";
-import { LiveWinsTicker } from "@/components/game/LiveWinsTicker";
 import { JackpotCounter } from "@/components/game/JackpotCounter";
 import { useBalance, useBootstrap, useInventory } from "@/hooks/useGame";
 
@@ -43,9 +42,6 @@ export default function GamePage() {
       className="min-h-full page-enter"
       style={{ position: "relative", zIndex: 1 }}
     >
-      {/* Live wins ticker — full-width band sous la topbar */}
-      <LiveWinsTicker />
-
       <div
         className="px-4 sm:px-6 md:px-8 pt-5 pb-16 mx-auto"
         style={{ maxWidth: 1280 }}
