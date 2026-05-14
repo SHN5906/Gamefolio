@@ -1634,7 +1634,7 @@ function normalize(
 
 // ── 20 CAISSES (de $0.10 à $10 000) ─────────────────────────────────────
 
-export const PACKS: Pack[] = [
+const RAW_PACKS: Pack[] = [
   // ═══════════ TIER 0 — LOTERIE (gambling extrême, jackpot rarissime) ═══════
   {
     id: "loterie",
@@ -2277,24 +2277,6 @@ export const PACKS: Pack[] = [
   },
 ];
 
-export const FREE_DAILY_LIMIT = 0;
-
-export const STARTING_BALANCE = 10.0;
-
-export function getPackById(id: string): Pack | undefined {
-  return PACKS.find((p) => p.id === id);
-}
-
-// Tirage pondéré — les dropRates sont normalisés à somme = 100 par `normalize()`
-export function rollCard(pack: Pack): GameCard {
-  let roll = Math.random() * 100;
-  for (const card of pack.cardPool) {
-    roll -= card.dropRate;
-    if (roll <= 0) return card;
-  }
-  return pack.cardPool[pack.cardPool.length - 1];
-}
-
 // ── Tirage de grade (PSA / Raw) ─────────────────────────────────────────
 import type { Grade, GradeWeights, OpeningResult } from "@/types/game";
 import { GRADE_PRICE_MULTIPLIER } from "@/types/game";
@@ -2318,6 +2300,151 @@ const LOW_RARITY_GRADE_WEIGHTS: GradeWeights = {
   "psa-9": 0,
   "psa-10": 0,
 };
+
+// ══════════════════════════════════════════════════════════════════════════
+// REBALANCER — ajuste les dropRates pour cibler un house edge par tier
+// ══════════════════════════════════════════════════════════════════════════
+//
+// Les cardPools dans RAW_PACKS représentent l'INTENT du game designer
+// (quelles cartes appartiennent au pack, quel poids relatif). Mais ces
+// poids ne garantissent pas un EV économiquement sain — un Pikachu
+// Illustrator à $6M (ceiling $72M PSA10) dans un pack à $0.10 fait
+// exploser l'EV à $288 (audit du 14/05, EV ratio 2880×, edge -288000%).
+//
+// On applique donc une transformation finale : binary-search sur un
+// exposant α qui amplifie/atténue les poids selon l'EV de chaque carte
+// (high-EV cards pénalisées plus que les trash). On cible un edge par
+// tier proche du marché casino TCG :
+//
+//   starter      18%  (cheap packs, gros edge — fournit le funnel)
+//   common       14%
+//   intermediate 11%
+//   premium      9%
+//   ultra        7%   (whale, faible edge pour attirer)
+//
+// Référence : Hellcase ~5-12%, Roobet ~8-15%, CSGO Empire ~10%.
+//
+// La transformation `w_i *= α^(ev_i / maxEv)` est monotone en α :
+// décroissante en α si w_i est high-EV, donc binary search converge
+// vers l'α qui donne l'EV cible exact. Pas de mutation chirurgicale
+// du pool, pas de cartes retirées — les drop rates s'auto-ajustent.
+
+const EDGE_BY_TIER: Record<Pack["tier"], number> = {
+  starter: 0.18,
+  common: 0.14,
+  intermediate: 0.11,
+  premium: 0.09,
+  ultra: 0.07,
+};
+
+function normalizeGrades(g: GradeWeights): Record<Grade, number> {
+  const total = Object.values(g).reduce((s, w) => s + w, 0);
+  return Object.fromEntries(
+    Object.entries(g).map(([k, w]) => [k, w / total]),
+  ) as Record<Grade, number>;
+}
+
+// Espérance du prix d'une carte sur la distribution de grade.
+function evWithGrades(card: GameCard, grades: GradeWeights): number {
+  const norm = normalizeGrades(grades);
+  return (Object.entries(norm) as [Grade, number][]).reduce(
+    (s, [g, p]) => s + p * card.value * GRADE_PRICE_MULTIPLIER[g],
+    0,
+  );
+}
+
+// Grade weights effectifs pour une carte donnée — réplique exacte de la
+// logique runtime de `pickGradeWeights` pour que rebalancer et roll
+// utilisent la même base d'EV.
+function effectiveGradesFor(pack: Pack, card: GameCard): GradeWeights {
+  const override = pack.gradeWeights?.[card.id];
+  if (override) return override;
+  if (pack.defaultGradeWeights) return pack.defaultGradeWeights;
+  if (card.rarity === "common" || card.rarity === "uncommon")
+    return LOW_RARITY_GRADE_WEIGHTS;
+  return DEFAULT_GRADE_WEIGHTS;
+}
+
+function rebalancePack(pack: Pack): Pack {
+  const targetEdge = EDGE_BY_TIER[pack.tier];
+  const targetEV = pack.price * (1 - targetEdge);
+
+  // EV par carte avec la VRAIE distribution de grade qui sera utilisée
+  // au tirage (cf. `pickGradeWeights`) — sinon le rebalancer sur-estime
+  // l'EV des packs starter qui sont pleins de commons / uncommons
+  // (lesquels ne peuvent PAS sortir en PSA 10 via LOW_RARITY_GRADE_WEIGHTS).
+  const evPer = pack.cardPool.map((c) =>
+    evWithGrades(c, effectiveGradesFor(pack, c)),
+  );
+
+  // Exposant de pénalité par carte. log10(ev/price + 1) :
+  //   - card ev ≤ 0       → 0           (trash, pas de pénalité)
+  //   - card ev = price   → log10(2)≈0.30 (légère pénalité)
+  //   - card ev = 10×price → log10(11)≈1.04
+  //   - card ev = 100×price → log10(101)≈2.00
+  //   - card ev = 10000×price → log10(10001)≈4.00
+  // Choix vs `ev/maxEv` initialement utilisé : log10 a un meilleur dynamic
+  // range. Si maxEv est dominé par UNE carte ultra-rare ($72M PSA10), les
+  // mid-tier cards ($4 Pikachu dans pack $0.20) avaient ev/maxEv proche de 0
+  // donc échappaient au scaling et faisaient exploser l'EV. log10 répartit
+  // la pénalité sur tout le spectre.
+  const exp = evPer.map((ev) =>
+    ev > 0 ? Math.log10(ev / pack.price + 1) : 0,
+  );
+
+  const totalW = pack.cardPool.reduce((s, c) => s + c.dropRate, 0);
+  const origProbs = pack.cardPool.map((c) => c.dropRate / totalW);
+
+  // Calcule l'EV pour un exposant α donné (transformation monotone décroissante).
+  const computeEV = (alpha: number): number => {
+    const adjusted = origProbs.map((p, i) => p * Math.pow(alpha, exp[i]));
+    const s = adjusted.reduce((a, b) => a + b, 0);
+    return adjusted.reduce((sum, w, i) => sum + (w / s) * evPer[i], 0);
+  };
+
+  // Binary search geometrique sur α ∈ [1e-6, 1e6].
+  let lo = 1e-6;
+  let hi = 1e6;
+  let alpha = 1;
+  for (let i = 0; i < 80; i++) {
+    alpha = Math.sqrt(lo * hi);
+    const ev = computeEV(alpha);
+    if (Math.abs(ev - targetEV) / targetEV < 0.01) break;
+    if (ev > targetEV) hi = alpha;
+    else lo = alpha;
+  }
+
+  // Applique l'exposant final + renormalise sur 100.
+  const adjusted = origProbs.map((p, i) => p * Math.pow(alpha, exp[i]));
+  const total = adjusted.reduce((s, w) => s + w, 0);
+  return {
+    ...pack,
+    cardPool: pack.cardPool.map((c, i) => ({
+      ...c,
+      dropRate: (adjusted[i] / total) * 100,
+    })),
+  };
+}
+
+export const PACKS: Pack[] = RAW_PACKS.map(rebalancePack);
+
+export const FREE_DAILY_LIMIT = 0;
+
+export const STARTING_BALANCE = 10.0;
+
+export function getPackById(id: string): Pack | undefined {
+  return PACKS.find((p) => p.id === id);
+}
+
+// Tirage pondéré — les dropRates sont normalisés à somme = 100 par `normalize()`
+export function rollCard(pack: Pack): GameCard {
+  let roll = Math.random() * 100;
+  for (const card of pack.cardPool) {
+    roll -= card.dropRate;
+    if (roll <= 0) return card;
+  }
+  return pack.cardPool[pack.cardPool.length - 1];
+}
 
 function pickGradeWeights(pack: Pack, card: GameCard): GradeWeights {
   const override = pack.gradeWeights?.[card.id];
