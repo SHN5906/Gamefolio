@@ -1,4 +1,4 @@
-// Design tokens CardFolio — Dark Glass Vault
+// Design tokens GameFolio — casino-grade dark glass
 // Utilisés dans globals.css (CSS vars) ET ici pour typage TypeScript
 
 export const colors = {

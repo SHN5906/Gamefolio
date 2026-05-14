@@ -17,6 +17,7 @@ import {
   useSellAllCards,
 } from "@/hooks/useGame";
 import { useTCGdexCard, tcgdexImageUrl } from "@/hooks/useTCGdexCard";
+import { toast } from "@/components/ui/Toaster";
 import type { GameCard } from "@/types/game";
 
 type SortMode = "recent" | "value-desc" | "value-asc";
@@ -52,7 +53,10 @@ export default function GameCollectionPage() {
       return;
     }
     const r = sellAll();
-    alert(`Vendu ${r.cardsSold} carte(s) pour $${r.totalGained.toFixed(2)}`);
+    toast.success(
+      `Vendu ${r.cardsSold} carte${r.cardsSold > 1 ? "s" : ""}`,
+      `+$${r.totalGained.toFixed(2)} crédités sur ton solde`,
+    );
     setConfirmSellAll(false);
   };
 

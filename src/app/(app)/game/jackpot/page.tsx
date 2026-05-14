@@ -16,6 +16,7 @@ import {
   useJackpot,
   useProfile,
 } from "@/hooks/useGame";
+import { toast } from "@/components/ui/Toaster";
 import type { InventoryItem } from "@/types/game";
 
 export default function JackpotPage() {
@@ -337,8 +338,15 @@ export default function JackpotPage() {
             onClose={() => setShowDeposit(false)}
             onDeposit={(ids) => {
               const res = deposit(ids, profile.username || "Toi");
-              if (res.ok) setShowDeposit(false);
-              else alert(res.reason);
+              if (res.ok) {
+                setShowDeposit(false);
+                toast.success(
+                  "Dépôt confirmé",
+                  `${ids.length} carte${ids.length > 1 ? "s" : ""} dans le pot.`,
+                );
+              } else {
+                toast.error("Dépôt refusé", res.reason);
+              }
             }}
           />
         )}

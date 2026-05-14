@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ShoppingCart, Zap, Star, Crown, Gem } from 'lucide-react'
 import { useBalance } from '@/hooks/useGame'
+import { toast } from '@/components/ui/Toaster'
 
 interface ShopBundle {
   id: string
@@ -28,9 +29,14 @@ export default function ShopPage() {
   const { balance, addBalance } = useBalance()
 
   const handlePurchase = (b: ShopBundle) => {
-    // Mode démo — on crédite directement
-    addBalance(b.amount)
-    alert(`Démo : +$${b.amount.toFixed(2)} crédités. Stripe arrive bientôt.`)
+    // Démo : crédit direct côté client. Stripe sera branché en Phase 2
+    // (cf. DEPLOY.md §3) — le bouton enverra alors vers Stripe Checkout.
+    const totalCredit = b.amount + (b.amount * b.bonus) / 100
+    addBalance(totalCredit)
+    toast.success(
+      `+$${totalCredit.toFixed(2)} crédités`,
+      `Pack ${b.id} acheté · bonus ${b.bonus}% inclus`,
+    )
   }
 
   return (
@@ -75,16 +81,6 @@ export default function ShopPage() {
           </div>
         </div>
 
-        <div
-          className="rounded-[var(--radius-sm)] border px-4 py-2.5 mb-6 text-[11.5px]"
-          style={{
-            background: 'var(--color-bg-glass)',
-            borderColor: 'var(--color-border)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
-          ⚠️ Mode démo — clique pour créditer directement (Stripe à venir).
-        </div>
 
         {/* Bundles */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

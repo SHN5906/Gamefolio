@@ -39,12 +39,12 @@ const PLANS = [
     badge: "Le plus choisi",
     features: [
       { txt: "Tout du Free", ok: true },
-      { txt: "Bonus quotidien $5 fictif", ok: true },
+      { txt: "Bonus quotidien $5", ok: true },
       { txt: "Cooldown réduit à 1h", ok: true },
       { txt: "Avatar personnalisé + cadre", ok: true },
       { txt: "Badge Plus dans le profil", ok: true },
       { txt: "Historique d'ouvertures illimité", ok: true },
-      { txt: "Pas de retrait IRL — strictement cosmétique", ok: true },
+      { txt: "Cosmétiques exclusifs", ok: true },
       { txt: "Animations exclusives VIP", ok: false },
     ],
   },
@@ -58,7 +58,7 @@ const PLANS = [
     highlight: false,
     features: [
       { txt: "Tout du Plus", ok: true },
-      { txt: "Bonus quotidien $25 fictif", ok: true },
+      { txt: "Bonus quotidien $25", ok: true },
       { txt: "Cooldown réduit à 15 min", ok: true },
       { txt: "Animations d'ouverture exclusives", ok: true },
       {
@@ -303,8 +303,8 @@ export default function PricingPage() {
           className="text-center text-[12px] mt-8"
           style={{ color: "var(--color-text-muted)" }}
         >
-          Paiements Stripe (PCI-DSS) · Annulable en 1 clic · Aucune monnaie
-          fictive ne peut être convertie en argent réel
+          Paiements Stripe (PCI-DSS) · Annulable en 1 clic · Pas de
+          pay-to-win, strictement cosmétique
         </p>
       </section>
 
@@ -334,12 +334,12 @@ export default function PricingPage() {
                 a: "Oui. Aucun engagement. Annulation en 1 clic depuis tes paramètres. Tu gardes l'accès VIP jusqu'à la fin de la période payée.",
               },
               {
-                q: "Est-ce que la monnaie fictive achetée peut être retirée ?",
-                a: "Non. La monnaie fictive ne peut JAMAIS être convertie en argent réel ou échangée contre des biens IRL. C'est ce qui rend le produit légal en France.",
+                q: "Les abonnements donnent un avantage en gameplay ?",
+                a: "Non. Strictement cosmétique + QoL. Les drop rates, les odds de la roue, les outcomes des battles et le jackpot sont identiques pour tous. Pas de pay-to-win.",
               },
               {
-                q: "Pourquoi pas de pack de monnaie fictive vendu directement ?",
-                a: "Pour rester strictement cosmétique. Vendre de la monnaie fictive utilisable pour jouer ferait basculer le produit en jeu d'argent au sens de l'ANJ (Autorité Nationale des Jeux). Nous refusons ce modèle.",
+                q: "Pourquoi pas de vente directe de solde ?",
+                a: "Pour préserver l'expérience de jeu. Le solde se gagne via les caisses, battles, missions et jackpot. Le tier VIP est un soutien à la plateforme, pas une avance sur gameplay.",
               },
               {
                 q: "Période d'essai ?",
@@ -388,7 +388,7 @@ export default function PricingPage() {
             className="text-[12px]"
             style={{ color: "var(--color-text-muted)" }}
           >
-            © 2026 GameFolio · Jeu en monnaie fictive · 18+
+            © 2026 GameFolio · 18+ · Démo pédagogique (Epitech)
           </span>
           <div className="flex items-center gap-5 text-[12px]">
             <Link href="/" style={{ color: "var(--color-text-muted)" }}>
