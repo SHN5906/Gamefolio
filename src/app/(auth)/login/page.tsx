@@ -168,7 +168,7 @@ export default function LoginPage() {
             className="text-[11px] mt-0.5"
             style={{ color: "var(--color-text-muted)" }}
           >
-            Le casino TCG en monnaie fictive.
+            Le casino TCG Pokémon premium.
           </p>
         </div>
       </div>

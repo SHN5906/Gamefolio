@@ -437,7 +437,7 @@ export default function SettingsPage() {
       <Section
         icon={AlertCircle}
         title="Jeu responsable"
-        subtitle="GameFolio est en monnaie fictive — mais si tu sens que tu joues trop, on est là"
+        subtitle="Si tu sens que tu joues trop, on est là. Limites, exclusions, support 24/7."
       >
         <ToggleRow label="Limiter mes ouvertures à 100/jour" />
         <ToggleRow label="Auto-exclusion 24h" />

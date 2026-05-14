@@ -25,10 +25,10 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const FEATURES = [
-  "$10 fictifs offerts à l'inscription",
+  "$10 offerts à l'inscription",
   "15 caisses thématiques (Kanto, Neo, Shinings, Cristaux…)",
   "Battles PvP, jackpot, roue d'upgrade, regrade",
-  "100% monnaie fictive · Aucune CB requise",
+  "Provably fair · Instant withdraw",
 ];
 
 export default function SignupPage() {
@@ -93,8 +93,8 @@ export default function SignupPage() {
           className="text-[13px] mb-7"
           style={{ color: "var(--color-text-muted)", lineHeight: 1.6 }}
         >
-          Le casino TCG en monnaie fictive. Aucun argent réel, aucune CB. Que du
-          fun.
+          Le casino TCG Pokémon premium. Caisses, battles, jackpot — tout ce
+          qu&apos;il faut pour vivre l&apos;adrénaline.
         </p>
 
         {/* Features */}
@@ -158,7 +158,7 @@ export default function SignupPage() {
             className="text-[13px] mb-5"
             style={{ color: "var(--color-text-muted)" }}
           >
-            $10 fictifs offerts · 18+ · Sans CB
+            $10 offerts à l&apos;inscription · 18+
           </p>
 
           <form

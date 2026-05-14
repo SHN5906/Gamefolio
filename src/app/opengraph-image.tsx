@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "GameFolio — Le casino TCG en monnaie fictive";
+export const alt = "GameFolio — Casino TCG Pokémon premium";
 
 const TOP_FACET = "60,12 101.6,36 60,60 18.4,36";
 const RIGHT_FACET = "101.6,36 101.6,84 60,108 60,60";
@@ -56,7 +56,7 @@ export default function OpenGraphImage() {
             maxWidth: 580,
           }}
         >
-          Le casino TCG en monnaie fictive.
+          Caisses Pokémon. Gros drops. Pot live.
         </div>
         <div
           style={{
@@ -65,7 +65,7 @@ export default function OpenGraphImage() {
             fontSize: 22,
           }}
         >
-          $10 offerts · 100% monnaie fictive · 18+
+          $10 offerts · Provably fair · 18+
         </div>
       </div>
 

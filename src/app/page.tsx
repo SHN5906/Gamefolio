@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "GameFolio — Ouvre des caisses TCG, sans débourser un centime",
+  title: "GameFolio — Casino TCG Pokémon",
   description:
-    "Le casino TCG en monnaie fictive. Caisses, roue d'upgrade, battles PvP, jackpot communautaire. $10 offerts à l'inscription, gratuit à vie.",
+    "Ouvre des caisses Pokémon, joue à la roue d'upgrade, défie d'autres joueurs en battle PvP, tente le jackpot communautaire. $10 offerts à l'inscription.",
 };
 
 export default function LandingPage() {
@@ -127,16 +127,16 @@ export default function LandingPage() {
             >
               Ouvre des caisses.
               <br />
-              <span className="gradient-text italic">Pas ta CB.</span>
+              <span className="gradient-text italic">Gagne des Pokémon.</span>
             </h1>
 
             <p
               className="text-[16px] md:text-[18px] max-w-xl leading-relaxed mb-7"
               style={{ color: "var(--color-text-secondary)" }}
             >
-              Le casino TCG en monnaie fictive — caisses, roue d&apos;upgrade,
-              battles PvP, jackpot communautaire. $10 fictifs offerts à
-              l&apos;inscription. Aucune CB, jamais.
+              Le casino TCG premium — caisses thématiques, roue d&apos;upgrade,
+              battles PvP, jackpot communautaire. $10 offerts à
+              l&apos;inscription.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
@@ -171,10 +171,10 @@ export default function LandingPage() {
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
               {[
-                "100% monnaie fictive",
-                "Aucune CB requise",
+                "Provably fair",
+                "Instant withdraw",
+                "Cartes TCGdex authentiques",
                 "18+",
-                "Conforme loi française",
               ].map((t) => (
                 <span
                   key={t}
@@ -206,8 +206,7 @@ export default function LandingPage() {
                 className="text-center text-[11px] mt-3"
                 style={{ color: "var(--color-text-muted)" }}
               >
-                Le pot communautaire en monnaie fictive. Tirage proportionnel à
-                la valeur déposée.
+                Pot communautaire — tirage proportionnel à la valeur déposée.
               </p>
             </div>
           </div>
@@ -222,7 +221,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
             { value: "1,2 M", label: "Caisses ouvertes" },
-            { value: "$8,4 M", label: "Cartes gagnées (fictif)" },
+            { value: "$8,4 M", label: "Cartes gagnées" },
             { value: "47 K", label: "Joueurs actifs" },
             { value: "$4 832", label: "Top win 24h" },
           ].map((s) => (
@@ -311,7 +310,7 @@ export default function LandingPage() {
               {
                 icon: Calendar,
                 title: "Missions journalières",
-                desc: "Connecte-toi, ouvre, battle, gagne. Chaque mission paie en monnaie fictive. Streak de 7 jours = bonus.",
+                desc: "Connecte-toi, ouvre, battle, gagne. Chaque mission paie cash sur ton solde. Streak de 7 jours = bonus.",
                 color: "var(--color-positive)",
                 bg: "var(--color-positive-soft)",
               },
@@ -378,7 +377,7 @@ export default function LandingPage() {
               {
                 num: "01",
                 title: "Crée ton compte",
-                desc: "Juste un email. Pas de CB, jamais. Vérification optionnelle.",
+                desc: "Juste un email — inscription en 10 secondes. Vérification optionnelle.",
               },
               {
                 num: "02",
@@ -455,7 +454,7 @@ export default function LandingPage() {
                 className="text-[10px] font-semibold uppercase tracking-[1.5px] mb-1.5"
                 style={{ color: "var(--color-positive)" }}
               >
-                Provably fair · 100% monnaie fictive
+                Provably fair · Instant withdraw
               </p>
               <h3
                 className="text-[20px] md:text-[24px] font-extrabold tracking-tight leading-tight mb-3"
@@ -464,24 +463,25 @@ export default function LandingPage() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                Aucun argent réel. Jamais.
+                Tirages auditables. Paiements instantanés.
               </h3>
               <p
                 className="text-[14px] leading-relaxed mb-4"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                GameFolio est un jeu en monnaie fictive uniquement. Tu ne peux
-                ni déposer ni retirer d&apos;argent réel. Les cartes gagnées
-                restent dans ton inventaire virtuel — elles ne peuvent pas être
-                échangées contre des biens IRL. Chaque tirage est généré côté
-                serveur avec un RNG cryptographique et est auditable.
+                Chaque tirage est généré côté serveur avec un RNG
+                cryptographique (crypto.getRandomValues) et logué pour audit.
+                Hash de seed disponible pour chaque ouverture — tu peux vérifier
+                que le résultat n&apos;a pas été manipulé après coup. Les
+                retraits sont créditités sur ton solde instantanément, sans
+                délai de validation.
               </p>
               <div className="flex flex-wrap gap-2">
                 {[
                   "18+ uniquement",
-                  "RNG côté serveur",
+                  "RNG cryptographique",
+                  "Hash de seed publié",
                   "Logs d'audit",
-                  "Conforme loi française",
                   "RGPD · EU",
                 ].map((b) => (
                   <span
@@ -521,20 +521,20 @@ export default function LandingPage() {
           <div className="flex flex-col gap-3">
             {[
               {
-                q: "Est-ce que je peux gagner de l'argent réel ?",
-                a: "Non. GameFolio est en monnaie fictive uniquement. Les cartes que tu gagnes restent dans ton inventaire virtuel et ne peuvent ni être revendues ni converties en euros.",
+                q: "Comment je récupère mes gains ?",
+                a: "Tes cartes restent dans ton inventaire, tu peux les revendre à tout moment au prix marché du grade. Ton solde est crédité instantanément après chaque tirage gagnant.",
               },
               {
-                q: "C'est légal en France ?",
-                a: "Oui. Le droit français autorise les jeux en monnaie fictive sans retrait IRL (art. 322-2-3 du Code de la sécurité intérieure). Par précaution, l'accès est interdit aux moins de 18 ans et géo-bloqué dans les pays qui interdisent les loot box (Belgique, Pays-Bas).",
+                q: "C'est sécurisé ?",
+                a: "Chaque tirage est exécuté côté serveur avec un RNG cryptographique. Hash de seed loggé pour audit. Tu peux demander la trace de n'importe quelle ouverture. Accès 18+ uniquement, conforme RGPD, géo-bloqué dans les pays interdisant les loot box.",
               },
               {
-                q: "Comment vous gagnez de l'argent alors ?",
-                a: "Pour l'instant rien — on est en mode acquisition gratuite. À terme : tier VIP (cosmétiques, animations exclusives, badges, capacité de stockage), pas de pay-to-win.",
+                q: "Comment vous gagnez de l'argent ?",
+                a: "House edge transparent par tier (6–18% selon la caisse, cf. drop table). Le pot communautaire jackpot prélève une commission de 5%. Tier VIP à venir avec cosmétiques exclusifs (pas de pay-to-win).",
               },
               {
-                q: "Et si je tombe à 0 $ fictif ?",
-                a: "Cooldown de 2 heures, puis tu reçois 5 $ fictifs offerts pour rejouer. Tu peux aussi revendre tes cartes (valeur marché du grade) à tout moment.",
+                q: "Et si je tombe à 0 $ ?",
+                a: "Cooldown de 2 heures pour la prévention de l'addiction, puis 5 $ offerts pour rejouer. Tu peux aussi revendre tes cartes (valeur marché du grade) à tout moment.",
               },
               {
                 q: "Comment je sais que les tirages ne sont pas truqués ?",
@@ -615,7 +615,7 @@ export default function LandingPage() {
             className="text-[14px] mb-6 max-w-md mx-auto"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            $10 offerts. Aucune CB. Pas d&apos;arnaque, pas de pop-up.
+            $10 offerts à l&apos;inscription. Pas d&apos;arnaque, pas de pop-up.
           </p>
           <Link
             href="/game"
@@ -644,7 +644,7 @@ export default function LandingPage() {
               className="text-[12px]"
               style={{ color: "var(--color-text-muted)" }}
             >
-              © 2026 GameFolio · Jeu en monnaie fictive · 18+
+              © 2026 GameFolio · 18+ · Démo pédagogique (Epitech)
             </span>
           </div>
           <div className="flex items-center gap-5 text-[12px]">

@@ -5,15 +5,15 @@ import { Providers } from "@/components/layout/providers";
 export const metadata: Metadata = {
   metadataBase: new URL("https://gamefolio.app"),
   title: {
-    default: "GameFolio — Ouvre des caisses TCG, sans débourser un centime",
+    default: "GameFolio — Le casino TCG Pokémon premium",
     template: "%s · GameFolio",
   },
   description:
-    "Le casino TCG en monnaie fictive. Ouvre des caisses, joue à la roue d'upgrade, défie d'autres joueurs en battle PvP. $10 offerts à l'inscription, gratuit à vie.",
+    "Ouvre des caisses Pokémon, joue à la roue d'upgrade, défie d'autres joueurs en battle PvP, tente le jackpot communautaire. $10 offerts à l'inscription.",
   keywords: [
     "caisses Pokémon",
     "lootbox TCG",
-    "casino fictif",
+    "casino TCG",
     "PSA grade",
     "roue upgrade",
     "battle PvP",
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "GameFolio",
-    title: "GameFolio — Ouvre des caisses TCG en monnaie fictive",
+    title: "GameFolio — Casino TCG Pokémon",
     description:
-      "Le casino TCG en monnaie fictive. Caisses, roue d'upgrade, battles PvP, jackpot.",
+      "Caisses thématiques, roue d'upgrade, battles PvP, jackpot communautaire. $10 offerts.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "GameFolio — Casino TCG en monnaie fictive",
+    title: "GameFolio — Casino TCG Pokémon",
     description: "Caisses, roue d'upgrade, battles PvP, jackpot. $10 offerts.",
   },
   robots: { index: true, follow: true },
