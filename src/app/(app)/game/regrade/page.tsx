@@ -14,7 +14,7 @@ import {
   useInventoryGraded,
   useRegradeItem,
 } from "@/hooks/useGame";
-import { getPackById } from "@/data/packs";
+import { PACKS } from "@/data/packs";
 import {
   REGRADE_COST_USD,
   type Grade,
@@ -57,17 +57,19 @@ export default function RegradePage() {
   function handleRegrade() {
     if (!selected) return;
     setError(null);
-    // On utilise le pack 'pack-kanto-base' comme distribution par défaut.
-    // À terme : table regrade_distribution côté BDD (cf. ARCHITECTURE.md §3.2).
-    const pack =
-      getPackById("pack-kanto-base") ?? getPackById(selected.card.id);
+    // Le pack n'est utilisé que comme "context" pour `pickGradeWeights`
+    // (override carte → defaultGradeWeights du pack → fallback DEFAULT
+    // ou LOW_RARITY selon rarity). On prend le premier pack existant
+    // comme container neutre — la vraie distribution viendra du fallback.
+    // À terme : table `regrade_distribution` côté BDD, cf. ARCHITECTURE.md §3.2.
+    const pack = PACKS[0];
     if (!pack) {
-      setError("Distribution de grade indisponible");
+      setError("Aucun pack disponible");
       return;
     }
     const res = regrade(selected.id, pack);
     if (!res.success) {
-      setError(res.reason ?? "unknown");
+      setError(res.reason ?? "Erreur inconnue");
       return;
     }
     setLastResult(res.result ?? null);
