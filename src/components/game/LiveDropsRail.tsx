@@ -37,7 +37,7 @@ export function LiveDropsRail() {
 
   return (
     <aside
-      className="hidden lg:flex flex-col flex-shrink-0 border-r overflow-hidden sticky top-0 self-start"
+      className="hidden lg:flex flex-col flex-shrink-0 border-l overflow-hidden sticky top-0 self-start"
       style={{
         width: 88,
         height: "100vh",
