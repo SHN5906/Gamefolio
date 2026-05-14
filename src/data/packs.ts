@@ -2282,22 +2282,33 @@ import type { Grade, GradeWeights, OpeningResult } from "@/types/game";
 import { GRADE_PRICE_MULTIPLIER } from "@/types/game";
 
 // Distribution par défaut quand un pack ne définit ni `gradeWeights[cardId]`
-// ni `defaultGradeWeights`. Heuristique : Raw majoritaire, PSA 10 très rare.
+// ni `defaultGradeWeights`.
+//
+// Refonte "pro casino dopamine" (14/05) : on remonte la part des PSA-5+
+// (de 28% à 50%) pour que chaque pull se sente "valorisé". Psychologie :
+// un Raw ressemble à "just a card", un PSA-8 à "a graded card I can flex".
+// PSA-10 reste rarissime (1% → 3%) pour garder le tail event excitant
+// sans le rendre trivial.
+//
+// Trade-off : EV global remonte mécaniquement (les grades multipliers
+// sont 1× / 1.6× / 3.5× / 6× / 12×). Le rebalanceur compense côté
+// dropRates pour respecter l'edge cible.
 export const DEFAULT_GRADE_WEIGHTS: GradeWeights = {
-  raw: 72,
-  "psa-5": 15,
-  "psa-8": 8,
-  "psa-9": 4,
-  "psa-10": 1,
+  raw: 50,
+  "psa-5": 25,
+  "psa-8": 15,
+  "psa-9": 7,
+  "psa-10": 3,
 };
 
-// Cartes communes (rarity == 'common' | 'uncommon') ne peuvent pas sortir en
-// PSA 10 — gradage des cartes < 5 \$ est économiquement absurde sur le marché réel.
+// Cartes communes (rarity == 'common' | 'uncommon') — graduation rare mais
+// pas inexistante. On remonte légèrement (PSA-9 à 1% accessible, PSA-10
+// reste à 0 — économiquement absurde pour une card < $5).
 const LOW_RARITY_GRADE_WEIGHTS: GradeWeights = {
-  raw: 92,
-  "psa-5": 7,
-  "psa-8": 1,
-  "psa-9": 0,
+  raw: 85,
+  "psa-5": 11,
+  "psa-8": 3,
+  "psa-9": 1,
   "psa-10": 0,
 };
 
@@ -2329,12 +2340,30 @@ const LOW_RARITY_GRADE_WEIGHTS: GradeWeights = {
 // vers l'α qui donne l'EV cible exact. Pas de mutation chirurgicale
 // du pool, pas de cartes retirées — les drop rates s'auto-ajustent.
 
+// ── House edge par tier — calibration "pro casino dopamine" ─────────────
+// Refonte 14/05 inspirée des standards du marché casino TCG :
+//   Hellcase ~5-8%, CSGO Empire ~3-5%, Roobet ~5-10%
+//
+// Les valeurs précédentes (7-18%) étaient mathématiquement saines mais
+// trop greedy pour la psychologie joueur. Hellcase fait $1M/mois pas
+// parce que les gens gagnent — parce qu'**ils ont l'impression de
+// gagner** : edge serré + grade distribution généreuse + variance
+// élevée = dopamine maximale.
+//
+// Pyramide d'incentives :
+//   - cheap packs (starter) : 10% — friction d'acquisition basse
+//   - mid packs (common-intermediate) : 6-8% — sweet spot rétention
+//   - premium-ultra : 3-5% — whale-friendly, edge fin mais variance haute
+//
+// Économiquement : un real casino ne survit pas longtemps à 3% edge
+// sur les ultra packs, mais pour une démo c'est exactement la cible
+// dopamine. Phase 2 prod : remonter à ~7% partout (sustainable).
 const EDGE_BY_TIER: Record<Pack["tier"], number> = {
-  starter: 0.18,
-  common: 0.14,
-  intermediate: 0.11,
-  premium: 0.09,
-  ultra: 0.07,
+  starter: 0.1,
+  common: 0.08,
+  intermediate: 0.06,
+  premium: 0.04,
+  ultra: 0.03,
 };
 
 function normalizeGrades(g: GradeWeights): Record<Grade, number> {
@@ -2376,19 +2405,23 @@ function effectiveGradesFor(pack: Pack, card: GameCard): GradeWeights {
 // (résultat : EV mythique > price, impossible de converger). Un ratio
 // adapté tier par tier garde la cohérence visuelle ("pas de trash sub-$50
 // dans un pack $10k") sans casser la math.
+// Floor de retour minimum visé par tier — combiné aux nouveaux edges et
+// à la grade distribution généreuse, ça produit l'expérience "chaque
+// pull a une valeur perçue significative".
 const MIN_VALUE_RATIO_BY_TIER: Record<Pack["tier"], number> = {
-  // starter/common/intermediate : pas de filtre. Ces pools sont structurés
-  // autour du trash (caterpie/weedle à $0.05) + quelques wins, et le
-  // rebalanceur s'en sort grâce à cette variété. Sans trash, le pool
-  // perd toute granularité de prix et l'EV explose vs target.
+  // starter : 0 — loterie/starter sont des entry packs ultra-cheap,
+  // le trash (caterpie $0.05) est cohérent avec le prix ($0.10-$0.20).
   starter: 0,
-  common: 0,
-  intermediate: 0,
-  // premium : ratio 1% — pack $50 → ≥ $0.50. Filtre les caterpie sans
-  // toucher aux cartes mid-tier.
-  premium: 0.01,
-  // ultra : ratio 0.5% — pack $10k → ≥ $50, pack $1k → ≥ $5.
-  // Garantit qu'un pack $10k ne droppe jamais une carte sub-$50.
+  // common : 1% — pack $1 → ≥ $0.01, pack $3 → ≥ $0.03. Retire les
+  // sub-cent ghost cards sans toucher au pool réel.
+  common: 0.01,
+  // intermediate : 2% — pack $3 → ≥ $0.06, pack $5 → ≥ $0.10. Le
+  // joueur ne se sent plus arnaqué par un caterpie sur un pack $5.
+  intermediate: 0.02,
+  // premium : 2% — pack $20 → ≥ $0.40, pack $50 → ≥ $1.
+  premium: 0.02,
+  // ultra : 0.5% — pack $10k → ≥ $50. Pas de trash dans les caisses
+  // luxe (cf. demande user "$10k ne doit pas drop $0.05").
   ultra: 0.005,
 };
 
