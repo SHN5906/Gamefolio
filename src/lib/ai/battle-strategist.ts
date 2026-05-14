@@ -27,9 +27,9 @@
 // défense pédagogique (chaîne reproductible vs « black box »).
 // ──────────────────────────────────────────────────────────────────────────
 
-import type { GameCard, Pack, Grade } from '@/types/game'
-import { GRADE_PRICE_MULTIPLIER } from '@/types/game'
-import { DEFAULT_GRADE_WEIGHTS } from '@/data/packs'
+import type { GameCard, Pack, Grade } from "@/types/game";
+import { GRADE_PRICE_MULTIPLIER } from "@/types/game";
+import { DEFAULT_GRADE_WEIGHTS } from "@/data/packs";
 
 // ══════════════════════════════════════════════════════════════════════════
 // 1.8.1 — PRÉPARATION DE DONNÉES
@@ -61,36 +61,36 @@ import { DEFAULT_GRADE_WEIGHTS } from '@/data/packs'
 //     scores z.
 
 export interface CardFeatures {
-  cardId: string
+  cardId: string;
   /** Probabilité d'être tirée dans ce pack, ∈ [0,1]. */
-  p: number
+  p: number;
   /** Prix Raw "officiel" de la carte (USD). */
-  rawValue: number
+  rawValue: number;
   /** Espérance du prix une fois le grade tiré, USD. */
-  expectedPrice: number
+  expectedPrice: number;
   /** Plafond du prix possible (PSA 10), USD — utile pour le tail. */
-  ceilingPrice: number
+  ceilingPrice: number;
   /** Variance du prix conditionnelle au tirage de cette carte. */
-  conditionalVariance: number
+  conditionalVariance: number;
 }
 
 export interface Dataset {
-  packId: string
+  packId: string;
   /** Coût d'ouverture (mise unitaire). */
-  unitCost: number
+  unitCost: number;
   /** Features ordonnés par espérance de prix décroissante. */
-  features: CardFeatures[]
+  features: CardFeatures[];
   /** Distribution de grade utilisée pour le calcul. */
-  gradeDistribution: Record<Grade, number>
+  gradeDistribution: Record<Grade, number>;
 }
 
 /** Distribution de grade effective pour le pack, fallback DEFAULT. */
 function packGradeDistribution(pack: Pack): Record<Grade, number> {
-  const weights = pack.defaultGradeWeights ?? DEFAULT_GRADE_WEIGHTS
-  const total = Object.values(weights).reduce((s, w) => s + w, 0)
+  const weights = pack.defaultGradeWeights ?? DEFAULT_GRADE_WEIGHTS;
+  const total = Object.values(weights).reduce((s, w) => s + w, 0);
   return Object.fromEntries(
     Object.entries(weights).map(([k, w]) => [k, w / total]),
-  ) as Record<Grade, number>
+  ) as Record<Grade, number>;
 }
 
 /** Espérance et variance du prix d'une carte sur la distribution de grade. */
@@ -98,15 +98,15 @@ function cardPriceMoments(
   rawValue: number,
   gradeDist: Record<Grade, number>,
 ): { mean: number; variance: number; ceiling: number } {
-  const grades = Object.keys(gradeDist) as Grade[]
-  const prices = grades.map(g => rawValue * GRADE_PRICE_MULTIPLIER[g])
-  const probs = grades.map(g => gradeDist[g])
-  const mean = prices.reduce((s, p, i) => s + p * probs[i], 0)
+  const grades = Object.keys(gradeDist) as Grade[];
+  const prices = grades.map((g) => rawValue * GRADE_PRICE_MULTIPLIER[g]);
+  const probs = grades.map((g) => gradeDist[g]);
+  const mean = prices.reduce((s, p, i) => s + p * probs[i], 0);
   const variance = prices.reduce(
     (s, p, i) => s + probs[i] * (p - mean) ** 2,
     0,
-  )
-  return { mean, variance, ceiling: Math.max(...prices) }
+  );
+  return { mean, variance, ceiling: Math.max(...prices) };
 }
 
 /**
@@ -114,9 +114,9 @@ function cardPriceMoments(
  * Garantie : `features.map(f => f.p).reduce(+) === 1` (à ε près).
  */
 export function prepareDataset(pack: Pack): Dataset {
-  const gradeDist = packGradeDistribution(pack)
-  const features: CardFeatures[] = pack.cardPool.map(card => {
-    const { mean, variance, ceiling } = cardPriceMoments(card.value, gradeDist)
+  const gradeDist = packGradeDistribution(pack);
+  const features: CardFeatures[] = pack.cardPool.map((card) => {
+    const { mean, variance, ceiling } = cardPriceMoments(card.value, gradeDist);
     return {
       cardId: card.id,
       p: card.dropRate / 100, // dropRate est en %
@@ -124,16 +124,16 @@ export function prepareDataset(pack: Pack): Dataset {
       expectedPrice: mean,
       ceilingPrice: ceiling,
       conditionalVariance: variance,
-    }
-  })
+    };
+  });
   // Tri descendant — utile pour les quantiles et l'analyse visuelle.
-  features.sort((a, b) => b.expectedPrice - a.expectedPrice)
+  features.sort((a, b) => b.expectedPrice - a.expectedPrice);
   return {
     packId: pack.id,
     unitCost: pack.price,
     features,
     gradeDistribution: gradeDist,
-  }
+  };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -167,43 +167,43 @@ export function prepareDataset(pack: Pack): Dataset {
 
 export interface PackInsights {
   /** μ — prix moyen au tirage, USD. */
-  ev: number
+  ev: number;
   /** σ² — variance totale (intra+inter). */
-  variance: number
+  variance: number;
   /** σ — écart type. */
-  stdDev: number
+  stdDev: number;
   /** σ/μ — risk per unit of return. */
-  coefVariation: number
+  coefVariation: number;
   /** EV − coût → utility marginale espérée. Négative = house edge. */
-  evMinusCost: number
+  evMinusCost: number;
   /** ev / unitCost → ratio rentabilité. */
-  evRatio: number
+  evRatio: number;
   /** Asymétrie de la distribution. */
-  skewness: number
+  skewness: number;
   /** Quantiles 10/50/90 du prix d'un tirage (ordre exact, distribution discrète). */
-  p10: number
-  p50: number
-  p90: number
+  p10: number;
+  p50: number;
+  p90: number;
   /** Probabilité de rembourser au moins la mise. */
-  probBreakEven: number
+  probBreakEven: number;
   /** Probabilité d'un jackpot (prix > 10× la mise). */
-  probJackpot: number
+  probJackpot: number;
 }
 
 /** Reconstruit la distribution discrète exacte des prix possibles. */
 function fullPriceDistribution(d: Dataset): { price: number; p: number }[] {
-  const grades = Object.keys(d.gradeDistribution) as Grade[]
-  const outcomes: { price: number; p: number }[] = []
+  const grades = Object.keys(d.gradeDistribution) as Grade[];
+  const outcomes: { price: number; p: number }[] = [];
   for (const f of d.features) {
     for (const g of grades) {
       outcomes.push({
         price: f.rawValue * GRADE_PRICE_MULTIPLIER[g],
         p: f.p * d.gradeDistribution[g],
-      })
+      });
     }
   }
-  outcomes.sort((a, b) => a.price - b.price)
-  return outcomes
+  outcomes.sort((a, b) => a.price - b.price);
+  return outcomes;
 }
 
 /** Quantile q ∈ [0,1] sur une distribution discrète triée croissant. */
@@ -211,45 +211,45 @@ function discreteQuantile(
   outcomes: { price: number; p: number }[],
   q: number,
 ): number {
-  let cum = 0
+  let cum = 0;
   for (const { price, p } of outcomes) {
-    cum += p
-    if (cum >= q) return price
+    cum += p;
+    if (cum >= q) return price;
   }
-  return outcomes[outcomes.length - 1].price
+  return outcomes[outcomes.length - 1].price;
 }
 
 export function computeInsights(d: Dataset): PackInsights {
   // EV totale : E[X] = Σ p_i × E[X | carte_i]
-  const ev = d.features.reduce((s, f) => s + f.p * f.expectedPrice, 0)
+  const ev = d.features.reduce((s, f) => s + f.p * f.expectedPrice, 0);
 
   // Variance totale = E[Var(X|card)] + Var(E[X|card]) — loi de la variance.
   const evInter = d.features.reduce(
     (s, f) => s + f.p * (f.expectedPrice - ev) ** 2,
     0,
-  )
+  );
   const evIntra = d.features.reduce(
     (s, f) => s + f.p * f.conditionalVariance,
     0,
-  )
-  const variance = evInter + evIntra
-  const stdDev = Math.sqrt(variance)
+  );
+  const variance = evInter + evIntra;
+  const stdDev = Math.sqrt(variance);
 
   // Skewness via le moment d'ordre 3 sur la distribution discrète complète.
-  const outcomes = fullPriceDistribution(d)
-  const m3 = outcomes.reduce((s, o) => s + o.p * (o.price - ev) ** 3, 0)
-  const skewness = stdDev > 0 ? m3 / stdDev ** 3 : 0
+  const outcomes = fullPriceDistribution(d);
+  const m3 = outcomes.reduce((s, o) => s + o.p * (o.price - ev) ** 3, 0);
+  const skewness = stdDev > 0 ? m3 / stdDev ** 3 : 0;
 
-  const p10 = discreteQuantile(outcomes, 0.1)
-  const p50 = discreteQuantile(outcomes, 0.5)
-  const p90 = discreteQuantile(outcomes, 0.9)
+  const p10 = discreteQuantile(outcomes, 0.1);
+  const p50 = discreteQuantile(outcomes, 0.5);
+  const p90 = discreteQuantile(outcomes, 0.9);
 
   const probBreakEven = outcomes
-    .filter(o => o.price >= d.unitCost)
-    .reduce((s, o) => s + o.p, 0)
+    .filter((o) => o.price >= d.unitCost)
+    .reduce((s, o) => s + o.p, 0);
   const probJackpot = outcomes
-    .filter(o => o.price >= 10 * d.unitCost)
-    .reduce((s, o) => s + o.p, 0)
+    .filter((o) => o.price >= 10 * d.unitCost)
+    .reduce((s, o) => s + o.p, 0);
 
   return {
     ev,
@@ -264,7 +264,7 @@ export function computeInsights(d: Dataset): PackInsights {
     p90,
     probBreakEven,
     probJackpot,
-  }
+  };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -300,57 +300,57 @@ export function computeInsights(d: Dataset): PackInsights {
 //   Faille : ignore complètement le break-even probability — peut grind à
 //   perte longtemps.
 
-export type StrategyName = 'greedy-ev' | 'risk-adjusted' | 'tail-hunter'
+export type StrategyName = "greedy-ev" | "risk-adjusted" | "tail-hunter";
 
 export interface StrategyVerdict {
-  name: StrategyName
+  name: StrategyName;
   /** Score de désir de jouer ∈ [0,1]. */
-  confidence: number
+  confidence: number;
   /** Score de "value" attribué (USD ou utility unit selon la stratégie). */
-  rawScore: number
+  rawScore: number;
   /** Phrase courte qui justifie la décision, lisible par l'utilisateur. */
-  rationale: string
+  rationale: string;
 }
 
-const sigmoid = (x: number) => 1 / (1 + Math.exp(-x))
+const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
 
 export function greedyEV(insights: PackInsights): StrategyVerdict {
-  const rawScore = insights.evMinusCost
-  const confidence = sigmoid(insights.evMinusCost / Math.max(1, insights.ev))
-  const sign = rawScore >= 0 ? '+' : '−'
+  const rawScore = insights.evMinusCost;
+  const confidence = sigmoid(insights.evMinusCost / Math.max(1, insights.ev));
+  const sign = rawScore >= 0 ? "+" : "−";
   return {
-    name: 'greedy-ev',
+    name: "greedy-ev",
     confidence,
     rawScore,
     rationale: `EV = $${insights.ev.toFixed(2)}, coût = $${(insights.ev - insights.evMinusCost).toFixed(2)} → marge ${sign}$${Math.abs(rawScore).toFixed(2)}. Je joue si marge > 0.`,
-  }
+  };
 }
 
 export function riskAdjusted(insights: PackInsights): StrategyVerdict {
   // Approximation log-utility : E[log(1+X/C)] ≈ log(1+μ/C) − σ²/(2(1+μ/C)²C²)
   // (développement de Taylor d'ordre 2 autour de μ/C).
-  const C = Math.max(0.01, insights.ev - insights.evMinusCost) // unitCost reconstruit
-  const muOverC = insights.ev / C
-  const logTerm = Math.log(1 + muOverC)
+  const C = Math.max(0.01, insights.ev - insights.evMinusCost); // unitCost reconstruit
+  const muOverC = insights.ev / C;
+  const logTerm = Math.log(1 + muOverC);
   const penalty =
-    insights.variance / (2 * Math.max(0.0001, (1 + muOverC) ** 2 * C ** 2))
-  const utility = logTerm - penalty
+    insights.variance / (2 * Math.max(0.0001, (1 + muOverC) ** 2 * C ** 2));
+  const utility = logTerm - penalty;
   return {
-    name: 'risk-adjusted',
+    name: "risk-adjusted",
     confidence: sigmoid(utility * 2),
     rawScore: utility,
-    rationale: `Utility log = ${logTerm.toFixed(3)}, pénalité σ² = ${penalty.toFixed(3)}. CV = σ/μ = ${insights.coefVariation.toFixed(2)} — ${insights.coefVariation < 1.5 ? 'risque acceptable' : 'volatilité trop haute'}.`,
-  }
+    rationale: `Utility log = ${logTerm.toFixed(3)}, pénalité σ² = ${penalty.toFixed(3)}. CV = σ/μ = ${insights.coefVariation.toFixed(2)} — ${insights.coefVariation < 1.5 ? "risque acceptable" : "volatilité trop haute"}.`,
+  };
 }
 
 export function tailHunter(insights: PackInsights): StrategyVerdict {
-  const rawScore = 2 * insights.probJackpot + 0.3 * insights.evRatio - 0.5
+  const rawScore = 2 * insights.probJackpot + 0.3 * insights.evRatio - 0.5;
   return {
-    name: 'tail-hunter',
+    name: "tail-hunter",
     confidence: sigmoid(rawScore * 3),
     rawScore,
-    rationale: `P(jackpot 10×) = ${(insights.probJackpot * 100).toFixed(2)}%, skew = ${insights.skewness.toFixed(1)}. ${insights.probJackpot > 0.005 ? 'Tail intéressante, je joue.' : 'Tail trop sec, je passe.'}`,
-  }
+    rationale: `P(jackpot 10×) = ${(insights.probJackpot * 100).toFixed(2)}%, skew = ${insights.skewness.toFixed(1)}. ${insights.probJackpot > 0.005 ? "Tail intéressante, je joue." : "Tail trop sec, je passe."}`,
+  };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -382,15 +382,15 @@ export function tailHunter(insights: PackInsights): StrategyVerdict {
 // moyenne pondérée par confiance.
 
 export interface StrategyComparison {
-  verdicts: StrategyVerdict[]
+  verdicts: StrategyVerdict[];
   /** Moyenne arithmétique des confidences. */
-  meanConfidence: number
+  meanConfidence: number;
   /** Robustness ∈ [0,1] — accord entre modèles. */
-  robustness: number
+  robustness: number;
   /** Décision finale : 'play' | 'skip' | 'borderline'. */
-  decision: 'play' | 'skip' | 'borderline'
+  decision: "play" | "skip" | "borderline";
   /** Texte court qui synthétise pour l'UI. */
-  summary: string
+  summary: string;
 }
 
 export function compareStrategies(insights: PackInsights): StrategyComparison {
@@ -398,28 +398,28 @@ export function compareStrategies(insights: PackInsights): StrategyComparison {
     greedyEV(insights),
     riskAdjusted(insights),
     tailHunter(insights),
-  ]
-  const confidences = verdicts.map(v => v.confidence)
+  ];
+  const confidences = verdicts.map((v) => v.confidence);
   const meanConfidence =
-    confidences.reduce((s, c) => s + c, 0) / confidences.length
+    confidences.reduce((s, c) => s + c, 0) / confidences.length;
   const variance =
     confidences.reduce((s, c) => s + (c - meanConfidence) ** 2, 0) /
-    confidences.length
-  const robustness = Math.max(0, 1 - Math.sqrt(variance) * 2)
+    confidences.length;
+  const robustness = Math.max(0, 1 - Math.sqrt(variance) * 2);
 
-  let decision: 'play' | 'skip' | 'borderline'
-  if (meanConfidence > 0.6 && robustness > 0.6) decision = 'play'
-  else if (meanConfidence < 0.4) decision = 'skip'
-  else decision = 'borderline'
+  let decision: "play" | "skip" | "borderline";
+  if (meanConfidence > 0.6 && robustness > 0.6) decision = "play";
+  else if (meanConfidence < 0.4) decision = "skip";
+  else decision = "borderline";
 
   const summary =
-    decision === 'play'
+    decision === "play"
       ? `Les 3 lectures convergent (robustness ${(robustness * 100).toFixed(0)}%). Je joue.`
-      : decision === 'skip'
+      : decision === "skip"
         ? `Consensus baissier (μ confidence ${(meanConfidence * 100).toFixed(0)}%). Je passe.`
-        : `Lectures contradictoires (robustness ${(robustness * 100).toFixed(0)}%) — EV vs variance en tension.`
+        : `Lectures contradictoires (robustness ${(robustness * 100).toFixed(0)}%) — EV vs variance en tension.`;
 
-  return { verdicts, meanConfidence, robustness, decision, summary }
+  return { verdicts, meanConfidence, robustness, decision, summary };
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -431,37 +431,37 @@ export function compareStrategies(insights: PackInsights): StrategyComparison {
 // défendable étape par étape via les sections 1.8.1 → 1.8.4.
 
 export interface AiArchetype {
-  id: 'rookie' | 'sharp' | 'whale'
-  name: string
-  emoji: string
-  strategy: StrategyName
+  id: "rookie" | "sharp" | "whale";
+  name: string;
+  emoji: string;
+  strategy: StrategyName;
   /** Description en une phrase pour l'utilisateur. */
-  tagline: string
+  tagline: string;
 }
 
 export const AI_ARCHETYPES: AiArchetype[] = [
   {
-    id: 'rookie',
-    name: 'Rookie',
-    emoji: '🎯',
-    strategy: 'greedy-ev',
-    tagline: 'Suit l\'EV pure. Prévisible mais imbattable sur le long terme.',
+    id: "rookie",
+    name: "Rookie",
+    emoji: "🎯",
+    strategy: "greedy-ev",
+    tagline: "Suit l'EV pure. Prévisible mais imbattable sur le long terme.",
   },
   {
-    id: 'sharp',
-    name: 'Sharp',
-    emoji: '🧠',
-    strategy: 'risk-adjusted',
-    tagline: 'Pondère par la variance. Joue Kelly. Survie > gain.',
+    id: "sharp",
+    name: "Sharp",
+    emoji: "🧠",
+    strategy: "risk-adjusted",
+    tagline: "Pondère par la variance. Joue Kelly. Survie > gain.",
   },
   {
-    id: 'whale',
-    name: 'Whale',
-    emoji: '🐋',
-    strategy: 'tail-hunter',
-    tagline: 'Chasse le jackpot. Skewness > rationalité.',
+    id: "whale",
+    name: "Whale",
+    emoji: "🐋",
+    strategy: "tail-hunter",
+    tagline: "Chasse le jackpot. Skewness > rationalité.",
   },
-]
+];
 
 /** Renvoie le décideur pour un archétype donné. */
 export function strategyForArchetype(
@@ -469,12 +469,12 @@ export function strategyForArchetype(
   insights: PackInsights,
 ): StrategyVerdict {
   switch (archetype.strategy) {
-    case 'greedy-ev':
-      return greedyEV(insights)
-    case 'risk-adjusted':
-      return riskAdjusted(insights)
-    case 'tail-hunter':
-      return tailHunter(insights)
+    case "greedy-ev":
+      return greedyEV(insights);
+    case "risk-adjusted":
+      return riskAdjusted(insights);
+    case "tail-hunter":
+      return tailHunter(insights);
   }
 }
 
@@ -488,20 +488,20 @@ export function strategyForArchetype(
 // mise en fonction de son archétype. Cette fonction sert au matchmaking.
 
 export interface BattleProposal {
-  pack: Pack
-  insights: PackInsights
-  comparison: StrategyComparison
+  pack: Pack;
+  insights: PackInsights;
+  comparison: StrategyComparison;
   /** Verdict spécifique à l'archétype proposé. */
-  verdict: StrategyVerdict
+  verdict: StrategyVerdict;
 }
 
 export function evaluateBattleProposal(
   pack: Pack,
   archetype: AiArchetype,
 ): BattleProposal {
-  const dataset = prepareDataset(pack)
-  const insights = computeInsights(dataset)
-  const comparison = compareStrategies(insights)
-  const verdict = strategyForArchetype(archetype, insights)
-  return { pack, insights, comparison, verdict }
+  const dataset = prepareDataset(pack);
+  const insights = computeInsights(dataset);
+  const comparison = compareStrategies(insights);
+  const verdict = strategyForArchetype(archetype, insights);
+  return { pack, insights, comparison, verdict };
 }

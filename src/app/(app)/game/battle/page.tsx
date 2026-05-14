@@ -13,11 +13,9 @@
 // ──────────────────────────────────────────────────────────────────────────
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import {
   Swords,
-  ArrowLeft,
   Brain,
   TrendingUp,
   AlertTriangle,
@@ -105,15 +103,6 @@ export default function BattlePage() {
         className="px-4 sm:px-6 md:px-8 pt-6 pb-16 mx-auto"
         style={{ maxWidth: 1280 }}
       >
-        <Link
-          href="/game"
-          className="flex items-center gap-2 text-[12px] font-medium mb-5 transition-colors hover:text-[var(--color-text-primary)]"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          <ArrowLeft size={13} />
-          Retour
-        </Link>
-
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
           <div>

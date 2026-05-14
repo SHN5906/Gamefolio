@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Target, Trophy, X, AlertCircle } from "lucide-react";
+import { Target, Trophy, X, AlertCircle } from "lucide-react";
 import { useInventoryGraded } from "@/hooks/useGame";
 import { PACKS, priceForGrade } from "@/data/packs";
 import {
@@ -115,17 +114,8 @@ export default function WheelPage() {
     >
       <div
         className="px-4 sm:px-6 md:px-8 pt-6 pb-16 mx-auto"
-        style={{ maxWidth: 1200 }}
+        style={{ maxWidth: 1280 }}
       >
-        <Link
-          href="/game"
-          className="flex items-center gap-2 text-[12px] font-medium mb-5 transition-colors hover:text-[var(--color-text-primary)]"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          <ArrowLeft size={13} />
-          Retour
-        </Link>
-
         <div className="mb-7">
           <div className="flex items-center gap-2 mb-2">
             <Target size={14} style={{ color: "var(--color-brand)" }} />

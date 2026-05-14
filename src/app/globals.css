@@ -232,7 +232,19 @@ body::after {
 }
 
 .page-enter {
-  animation: fadeInUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  /* Anim allégée pour la nav entre tabs /game/* : opacity-only, 180ms.
+     Avant : fadeInUp avec translateY(10px) sur 350ms — visible et lourd
+     quand on switche rapidement entre Caisses/Battles/Jackpot. */
+  animation: pageFade 0.18s ease-out both;
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Stagger pour enfants */

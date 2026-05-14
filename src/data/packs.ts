@@ -2388,9 +2388,7 @@ function rebalancePack(pack: Pack): Pack {
   // mid-tier cards ($4 Pikachu dans pack $0.20) avaient ev/maxEv proche de 0
   // donc échappaient au scaling et faisaient exploser l'EV. log10 répartit
   // la pénalité sur tout le spectre.
-  const exp = evPer.map((ev) =>
-    ev > 0 ? Math.log10(ev / pack.price + 1) : 0,
-  );
+  const exp = evPer.map((ev) => (ev > 0 ? Math.log10(ev / pack.price + 1) : 0));
 
   const totalW = pack.cardPool.reduce((s, c) => s + c.dropRate, 0);
   const origProbs = pack.cardPool.map((c) => c.dropRate / totalW);

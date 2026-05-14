@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   Sparkles,
   TrendingUp,
   TrendingDown,
@@ -82,17 +81,8 @@ export default function RegradePage() {
     >
       <div
         className="px-4 sm:px-6 md:px-8 pt-6 pb-16 mx-auto"
-        style={{ maxWidth: 1100 }}
+        style={{ maxWidth: 1280 }}
       >
-        <Link
-          href="/game"
-          className="flex items-center gap-2 text-[12px] font-medium mb-5 transition-colors hover:text-[var(--color-text-primary)]"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          <ArrowLeft size={13} />
-          Retour
-        </Link>
-
         <div className="flex items-end justify-between mb-7">
           <div>
             <div className="flex items-center gap-2 mb-2">
