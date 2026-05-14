@@ -81,6 +81,11 @@ export default function BattlePage() {
           : "tie";
     setOutcome({ playerOpen, aiOpen, winner });
     setPhase("reveal");
+    // Stats — incrémente battles total, win si player
+    import("@/lib/data/stats").then(({ incrementStat }) => {
+      incrementStat("battles");
+      if (winner === "player") incrementStat("battlesWon");
+    });
     // Pot redistribué en fin d'animation reel (cf. REEL_DURATION_MS)
     setTimeout(() => {
       if (winner === "player") addBalance(pack.price * 2);

@@ -208,3 +208,70 @@ export function useProfile() {
   const reset = useCallback(() => resetAccountStore(), []);
   return { profile, updateProfile: update, resetAccount: reset };
 }
+
+// ── Jackpot ─────────────────────────────────────────────────────────────
+import {
+  getJackpotRound,
+  getJackpotHistory,
+  depositToJackpot,
+  type JackpotRound,
+} from "@/lib/data/jackpot";
+
+const EMPTY_ROUND: JackpotRound = {
+  id: "ssr",
+  startedAt: 0,
+  endsAt: 0,
+  status: "open",
+  participants: [],
+  totalPot: 0,
+};
+
+export function useJackpot() {
+  // Resync à chaque tick de seconde pour le countdown ET sur l'event custom
+  // (dépôts bots / settle). Le getter recalcule status si timer expired.
+  const round = useStorageEvent(
+    "gf:jackpot-changed",
+    getJackpotRound,
+    EMPTY_ROUND,
+  );
+  const [now, setNow] = useState<number>(() => (isClient ? Date.now() : 0));
+  useEffect(() => {
+    const tick = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(tick);
+  }, []);
+
+  // Force un re-lecture quand le statut bascule (open → drawing → closed)
+  // Le getter `getJackpotRound` gère lui-même le ré-archivage.
+  useEffect(() => {
+    if (!isClient) return;
+    if (round.status === "open" && now >= round.endsAt) {
+      getJackpotRound(); // déclenche bascule drawing + dispatch event
+    } else if (
+      round.status === "drawing" &&
+      now - round.endsAt >= 6000 // DRAWING_DURATION_MS
+    ) {
+      getJackpotRound(); // déclenche settle
+    }
+  }, [now, round.status, round.endsAt]);
+
+  const remainingMs =
+    round.status === "open" ? Math.max(0, round.endsAt - now) : 0;
+  const remainingSec = Math.floor(remainingMs / 1000);
+  const min = Math.floor(remainingSec / 60);
+  const sec = remainingSec % 60;
+  const label = `${min}:${String(sec).padStart(2, "0")}`;
+
+  const deposit = useCallback(
+    (itemIds: string[], username: string) =>
+      depositToJackpot(itemIds, username),
+    [],
+  );
+
+  return {
+    round,
+    remainingMs,
+    label,
+    deposit,
+    getHistory: getJackpotHistory,
+  };
+}

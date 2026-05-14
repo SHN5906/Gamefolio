@@ -362,6 +362,21 @@ export function recordOpening(
   price: number,
 ): OpeningResult {
   const { isNew } = addInventoryItem(card, grade, price, "pack");
+  // Stats : on tracke chaque ouverture et chaque carte holo+
+  // Import dynamique pour éviter une dépendance circulaire stats → game.
+  import("./stats").then(({ incrementStat }) => {
+    incrementStat("opens");
+    if (
+      card.rarity === "holo" ||
+      card.rarity === "shining" ||
+      card.rarity === "gold-star" ||
+      card.rarity === "crystal" ||
+      card.rarity === "secret-rare" ||
+      card.rarity === "rainbow-rare"
+    ) {
+      incrementStat("holos");
+    }
+  });
   return {
     card,
     grade,
@@ -454,6 +469,9 @@ export function regradeItem(
   addBalance(-REGRADE_COST_USD);
   removeInventoryItem(itemId);
   addInventoryItem(item.card, newGrade, newPrice, "regrade");
+
+  // Stats — incrémente le compteur de regrade
+  import("./stats").then(({ incrementStat }) => incrementStat("regrades"));
 
   return {
     success: true,
@@ -555,4 +573,8 @@ export function resetAccount(): void {
   );
   window.dispatchEvent(new CustomEvent("gf:inventory-changed"));
   window.dispatchEvent(new CustomEvent("gf:profile-changed"));
+  // Stats + jackpot ont leurs propres events — on les notifie aussi pour
+  // que les pages Missions / Jackpot resync immédiatement.
+  window.dispatchEvent(new CustomEvent("gf:stats-changed"));
+  window.dispatchEvent(new CustomEvent("gf:jackpot-changed"));
 }

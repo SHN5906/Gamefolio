@@ -106,6 +106,12 @@ export function spinWheel(
     if (removeInventoryItem(item.id)) consumedItemIds.push(item.id);
   }
 
+  // Stats — incrémente spin total, et win si gagné
+  import("./stats").then(({ incrementStat }) => {
+    incrementStat("wheelSpins");
+    if (won) incrementStat("wheelWins");
+  });
+
   if (won) {
     addInventoryItem(targetCard, input.targetGrade, targetPrice, "wheel");
     return {
