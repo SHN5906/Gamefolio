@@ -1,17 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import {
-  Sparkles,
-  Swords,
-  Trophy,
-  Gift,
-  ShoppingCart,
-  ArrowUpRight,
-  Wand2,
-  Target,
-} from "lucide-react";
+import { Sparkles, Trophy, Gift } from "lucide-react";
 import { PACKS } from "@/data/packs";
 import { PackCard } from "@/components/game/PackCard";
 import { DailyBar } from "@/components/game/DailyBar";
@@ -119,54 +109,10 @@ export default function GamePage() {
           <DailyBar />
         </div>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-          <QuickAction
-            href="/game/battle"
-            icon={<Swords size={16} />}
-            label="Battles PvP"
-            color="#FF4D5E"
-            bg="rgba(255,77,94,0.12)"
-          />
-          <QuickAction
-            href="/game/jackpot"
-            icon={<Trophy size={16} />}
-            label="Jackpot"
-            color="#FFD700"
-            bg="rgba(255,215,0,0.12)"
-            badge="LIVE"
-          />
-          <QuickAction
-            href="/game/wheel"
-            icon={<Target size={16} />}
-            label="Roue Upgrade"
-            color="#5B7FFF"
-            bg="rgba(91,127,255,0.12)"
-            badge="NEW"
-          />
-          <QuickAction
-            href="/game/regrade"
-            icon={<Wand2 size={16} />}
-            label="Re-grade"
-            color="#FFB450"
-            bg="rgba(255,180,80,0.12)"
-            badge="NEW"
-          />
-          <QuickAction
-            href="/game/missions"
-            icon={<Gift size={16} />}
-            label="Missions"
-            color="#10D9A0"
-            bg="rgba(16,217,160,0.12)"
-          />
-          <QuickAction
-            href="/game/shop"
-            icon={<ShoppingCart size={16} />}
-            label="Boutique"
-            color="#8B5CF6"
-            bg="rgba(139,92,246,0.12)"
-          />
-        </div>
+        {/* Note dev : la grille QuickActions a été retirée — les 5 modes
+            principaux (Battles/Jackpot/Roue/Regrade) sont dans GameModeTabs
+            au-dessus, Missions/Boutique restent accessibles via la Sidebar.
+            Single source of truth = la barre de tabs sticky. */}
 
         {/* Featured */}
         {featured.length > 0 && (
@@ -352,68 +298,6 @@ function StatCard({
         {sub}
       </p>
     </div>
-  );
-}
-
-function QuickAction({
-  href,
-  icon,
-  label,
-  color,
-  bg,
-  badge,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  color: string;
-  bg: string;
-  badge?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group flex items-center gap-3 px-4 py-3 rounded-[var(--radius-md)] border transition-all hover:scale-[1.02]"
-      style={{
-        background: "var(--color-bg-elevated)",
-        borderColor: "var(--color-border)",
-      }}
-    >
-      <div
-        className="w-9 h-9 rounded-[var(--radius-sm)] flex items-center justify-center"
-        style={{ background: bg, color }}
-      >
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p
-          className="text-[13px] font-bold"
-          style={{
-            fontFamily: "var(--font-display)",
-            color: "var(--color-text-primary)",
-          }}
-        >
-          {label}
-        </p>
-      </div>
-      {badge ? (
-        <span
-          className="px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-[1px]"
-          style={{
-            background: "var(--color-negative-soft)",
-            color: "var(--color-negative)",
-          }}
-        >
-          {badge}
-        </span>
-      ) : (
-        <ArrowUpRight
-          size={14}
-          className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          style={{ color: "var(--color-text-muted)" }}
-        />
-      )}
-    </Link>
   );
 }
 

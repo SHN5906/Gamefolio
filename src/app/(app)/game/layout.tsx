@@ -14,9 +14,13 @@ export default function GameLayout({
   return (
     <div className="flex h-full min-h-0">
       <LiveDropsRail />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative">
+        {/* Tabs wrapper avec z-index élevé pour s'assurer qu'aucun
+            JackpotCounter, modale ou stacking context enfant ne passe
+            par-dessus. La barre est sticky → toujours visible en haut
+            du scroll. */}
         <GameModeTabs />
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 relative">{children}</div>
       </div>
     </div>
   );
