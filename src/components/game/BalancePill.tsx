@@ -1,11 +1,20 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { DollarSign, Plus } from 'lucide-react'
 import { useBalance } from '@/hooks/useGame'
 
 export function BalancePill() {
   const { balance } = useBalance()
+  // Balance lue depuis localStorage côté client → diverge du SSR (qui
+  // rend 0.00). On gate l'affichage derrière `mounted` pour éviter le
+  // mismatch d'hydratation. Même pattern que Sidebar/Topbar greeting.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  const displayBalance = mounted ? balance : 0
 
   return (
     <Link
@@ -35,7 +44,7 @@ export function BalancePill() {
           letterSpacing: '-0.01em',
         }}
       >
-        {balance.toFixed(2)}
+        {displayBalance.toFixed(2)}
       </span>
       <div
         className="w-6 h-7 rounded-[6px] flex items-center justify-center transition-colors"
