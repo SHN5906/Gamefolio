@@ -2365,15 +2365,53 @@ function effectiveGradesFor(pack: Pack, card: GameCard): GradeWeights {
   return DEFAULT_GRADE_WEIGHTS;
 }
 
+// ── Filtre de cohérence prix-pack / valeur-carte ────────────────────────
+// Une caisse à $10 000 ne doit PAS pouvoir dropper un Caterpie à $0.05.
+// On exige que la valeur Raw d'une carte représente au moins MIN_VALUE_RATIO
+// du prix du pack. En dessous, la carte est retirée du pool avant le
+// rebalanceur.
+//
+// Ratio par tier (pas uniforme) — un ratio uniforme à 1% écraserait
+// mythic ($100) dont le pool n'a pas de cartes entre $1 et $220
+// (résultat : EV mythique > price, impossible de converger). Un ratio
+// adapté tier par tier garde la cohérence visuelle ("pas de trash sub-$50
+// dans un pack $10k") sans casser la math.
+const MIN_VALUE_RATIO_BY_TIER: Record<Pack["tier"], number> = {
+  // starter/common/intermediate : pas de filtre. Ces pools sont structurés
+  // autour du trash (caterpie/weedle à $0.05) + quelques wins, et le
+  // rebalanceur s'en sort grâce à cette variété. Sans trash, le pool
+  // perd toute granularité de prix et l'EV explose vs target.
+  starter: 0,
+  common: 0,
+  intermediate: 0,
+  // premium : ratio 1% — pack $50 → ≥ $0.50. Filtre les caterpie sans
+  // toucher aux cartes mid-tier.
+  premium: 0.01,
+  // ultra : ratio 0.5% — pack $10k → ≥ $50, pack $1k → ≥ $5.
+  // Garantit qu'un pack $10k ne droppe jamais une carte sub-$50.
+  ultra: 0.005,
+};
+
+function filterCoherentPool(pack: Pack): GameCard[] {
+  const floor = pack.price * MIN_VALUE_RATIO_BY_TIER[pack.tier];
+  const kept = pack.cardPool.filter((c) => c.value >= floor);
+  // Garde-fou : si le filtre vide tout (cas dégénéré), on conserve l'original
+  // plutôt que de servir un pack vide.
+  return kept.length > 0 ? kept : pack.cardPool;
+}
+
 function rebalancePack(pack: Pack): Pack {
   const targetEdge = EDGE_BY_TIER[pack.tier];
   const targetEV = pack.price * (1 - targetEdge);
+
+  // 1. Filtre prix : retire les cartes incohérentes avec le tier du pack
+  const filteredPool = filterCoherentPool(pack);
 
   // EV par carte avec la VRAIE distribution de grade qui sera utilisée
   // au tirage (cf. `pickGradeWeights`) — sinon le rebalancer sur-estime
   // l'EV des packs starter qui sont pleins de commons / uncommons
   // (lesquels ne peuvent PAS sortir en PSA 10 via LOW_RARITY_GRADE_WEIGHTS).
-  const evPer = pack.cardPool.map((c) =>
+  const evPer = filteredPool.map((c) =>
     evWithGrades(c, effectiveGradesFor(pack, c)),
   );
 
@@ -2390,8 +2428,9 @@ function rebalancePack(pack: Pack): Pack {
   // la pénalité sur tout le spectre.
   const exp = evPer.map((ev) => (ev > 0 ? Math.log10(ev / pack.price + 1) : 0));
 
-  const totalW = pack.cardPool.reduce((s, c) => s + c.dropRate, 0);
-  const origProbs = pack.cardPool.map((c) => c.dropRate / totalW);
+  // dropRates des cartes filtrées — on les renormalise localement
+  const totalW = filteredPool.reduce((s, c) => s + c.dropRate, 0);
+  const origProbs = filteredPool.map((c) => c.dropRate / totalW);
 
   // Calcule l'EV pour un exposant α donné (transformation monotone décroissante).
   const computeEV = (alpha: number): number => {
@@ -2417,7 +2456,7 @@ function rebalancePack(pack: Pack): Pack {
   const total = adjusted.reduce((s, w) => s + w, 0);
   return {
     ...pack,
-    cardPool: pack.cardPool.map((c, i) => ({
+    cardPool: filteredPool.map((c, i) => ({
       ...c,
       dropRate: (adjusted[i] / total) * 100,
     })),
