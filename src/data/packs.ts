@@ -1577,7 +1577,7 @@ const CARDS = {
     energy: "colorless",
     animTier: "base" as const,
   },
-} satisfies Record<string, GameCard>;
+} satisfies Record<string, Omit<GameCard, "dropRate">>;
 
 // ── Pools réutilisables (trash, énergie) ────────────────────────────────
 // Chaque caisse contient une part importante de ces cartes nulles pour
