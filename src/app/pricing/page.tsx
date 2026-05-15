@@ -303,8 +303,8 @@ export default function PricingPage() {
           className="text-center text-[12px] mt-8"
           style={{ color: "var(--color-text-muted)" }}
         >
-          Paiements Stripe (PCI-DSS) · Annulable en 1 clic · Pas de
-          pay-to-win, strictement cosmétique
+          Paiements Stripe (PCI-DSS) · Annulable en 1 clic · Pas de pay-to-win,
+          strictement cosmétique
         </p>
       </section>
 
